@@ -14,7 +14,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-import logging
+import logging, aiohttp
 
 from telegram import __version__ as TG_VER
 
@@ -38,7 +38,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-
+bytic_address = 'Сиреневый бульвар, 11, Троицк, Москва'
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -52,11 +52,13 @@ main_markup = ReplyKeyboardMarkup(
         )
 markup_1 = ReplyKeyboardMarkup(
             [['помощь', 'телефон'],
-             ['вопросы', 'назад']], one_time_keyboard=False
+             ['вопросы', 'назад'],
+             ['адрес']], one_time_keyboard=False
         )
 markup_5 = ReplyKeyboardMarkup(
             [['помощь1', 'телефон1'],
-             ['вопросы1', 'назад1']], one_time_keyboard=False)
+             ['вопросы1', 'назад1'],
+             ['адрес1']], one_time_keyboard=False)
 
 que_dct_1 = que_dct_5 = {'вопрос_1': 'ответ_1', 'вопрос_2': 'ответ_2'}
 markup_q_1 = markup_q_5 = ReplyKeyboardMarkup(list(map(lambda x: [x], que_dct_1)) + [['назад']], one_time_keyboard=False)
@@ -111,7 +113,7 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE, back_mes
 
 
 async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    # print('menu_1')
+    print('menu_1')
     """Stores the photo and asks for a location."""
     if update.message.text == 'помощь':
         await update.message.reply_text(
@@ -126,7 +128,38 @@ async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         return QUE_1
     elif update.message.text == 'назад':
         return await start(update, context, back=True)
+    elif update.message.text == 'адрес':
+        geocoder_uri = "http://geocode-maps.yandex.ru/1.x/"
+        response = await get_response(geocoder_uri, params={
+            "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+            "format": "json",
+            "geocode": bytic_address
+        })
+        toponym = response["response"]["GeoObjectCollection"][
+            "featureMember"][0]["GeoObject"]
+        rect = toponym['boundedBy']['Envelope']
+        delta = min([abs(float(rect['lowerCorner'].split()[0]) - float(rect['upperCorner'].split()[0])),
+                     abs(float(rect['lowerCorner'].split()[1]) - float(rect['upperCorner'].split()[1]))]) / 2
+        toponym_coodrinates = toponym["Point"]["pos"]
+        toponym_longitude, toponym_lattitude = toponym_coodrinates.split(" ")
+        ll, spn = ",".join([toponym_longitude, toponym_lattitude]), ",".join([str(delta), str(delta)]),
+        # Можно воспользоваться готовой функцией,
+        # которую предлагалось сделать на уроках, посвящённых HTTP-геокодеру.
 
+        static_api_request = f"http://static-maps.yandex.ru/1.x/?ll={ll}&spn={spn}&l=map&pt={','.join([toponym_longitude, toponym_lattitude]) + ',pm2rdl'}"
+        await context.bot.send_photo(
+            update.message.chat_id,  # Идентификатор чата. Куда посылать картинку.
+            # Ссылка на static API, по сути, ссылка на картинку.
+            # Телеграму можно передать прямо её, не скачивая предварительно карту.
+            static_api_request,
+            caption=bytic_address
+        )
+
+async def get_response(url, params):
+    logger.info(f"getting {url}")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params=params) as resp:
+            return await resp.json()
 
 async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     # print('menu_5')
@@ -143,6 +176,33 @@ async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         return QUE_5
     elif update.message.text == 'назад1':
         return await start(update, context, back=True)
+    elif update.message.text == 'адрес1':
+
+        geocoder_uri = "http://geocode-maps.yandex.ru/1.x/"
+        response = await get_response(geocoder_uri, params={
+            "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+            "format": "json",
+            "geocode": bytic_address
+        })
+        toponym = response["response"]["GeoObjectCollection"][
+            "featureMember"][0]["GeoObject"]
+        rect = toponym['boundedBy']['Envelope']
+        delta = min([abs(float(rect['lowerCorner'].split()[0]) - float(rect['upperCorner'].split()[0])),
+                     abs(float(rect['lowerCorner'].split()[1]) - float(rect['upperCorner'].split()[1]))]) / 2
+        toponym_coodrinates = toponym["Point"]["pos"]
+        toponym_longitude, toponym_lattitude = toponym_coodrinates.split(" ")
+        ll, spn = ",".join([toponym_longitude, toponym_lattitude]), ",".join([str(delta), str(delta)]),
+        # Можно воспользоваться готовой функцией,
+        # которую предлагалось сделать на уроках, посвящённых HTTP-геокодеру.
+
+        static_api_request = f"http://static-maps.yandex.ru/1.x/?ll={ll}&spn={spn}&l=map&pt={','.join([toponym_longitude, toponym_lattitude]) + ',pm2rdl'}"
+        await context.bot.send_photo(
+            update.message.chat_id,  # Идентификатор чата. Куда посылать картинку.
+            # Ссылка на static API, по сути, ссылка на картинку.
+            # Телеграму можно передать прямо её, не скачивая предварительно карту.
+            static_api_request,
+            caption=bytic_address
+        )
 
 async def que_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     for que, ans in que_dct_1.items():
