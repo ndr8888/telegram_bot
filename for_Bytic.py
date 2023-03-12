@@ -45,17 +45,21 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-MAIN_MENU, MENU_1, MENU_5, BACK = range(4)
+MAIN_MENU, MENU_1, MENU_5, QUE_1, QUE_5 = range(5)
 
 main_markup = ReplyKeyboardMarkup(
             [["1-4 классы", "5-11 классы"]], one_time_keyboard=False
         )
 markup_1 = ReplyKeyboardMarkup(
-            [['помощь', 'телефон', 'назад']], one_time_keyboard=False
+            [['помощь', 'телефон'],
+             ['вопросы', 'назад']], one_time_keyboard=False
         )
 markup_5 = ReplyKeyboardMarkup(
-            [['помощь1', 'телефон1', 'назад1']], one_time_keyboard=False
-        )
+            [['помощь1', 'телефон1'],
+             ['вопросы1', 'назад1']], one_time_keyboard=False)
+
+que_dct_1 = que_dct_5 = {'вопрос_1': 'ответ_1', 'вопрос_2': 'ответ_2'}
+markup_q_1 = markup_q_5 = ReplyKeyboardMarkup(list(map(lambda x: [x], que_dct_1)) + [['назад']], one_time_keyboard=False)
 
 async def help(update, context):
     await update.message.reply_text(
@@ -80,48 +84,34 @@ async def work_time(update, context):
     await update.message.reply_text(
         "Время работы: круглосуточно.")
 
-async def back(update, context):
-    print('back')
-    await update.message.reply_text(
-        "Hi! My name is Professor Bot. I will hold a conversation with you. "
-        "Send /cancel to stop talking to me.\n\n"
-        "Are you a boy or a girl?",
-        reply_markup=main_markup,
-    )
-    return MAIN_MENU
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print('start')
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, back=False) -> int:
+    # print('start')
     """Starts the conversation and asks the user about their gender."""
     await update.message.reply_text(
-        "Hi! My name is Professor Bot. I will hold a conversation with you. "
-        "Send /cancel to stop talking to me.\n\n"
-        "Are you a boy or a girl?",
+        'Выберите нужный вам класс',
         reply_markup=main_markup,
     )
     return MAIN_MENU
 
 
-async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE, back_message=None) -> int:
     """Stores the selected gender and asks for a photo."""
-    print('main_menu')
+    # print('main_menu')
     user = update.message.from_user
-    if update.message.text == '1-4 классы':
+    if '1-4 классы' in [update.message.text, back_message]:
         await update.message.reply_text(
-            "I see! Please send me a photo of yourself, "
-            "so I know what you look like, or send /skip if you don't want to.",
+            "Выберите нужное вам действие",
             reply_markup=markup_1)
         return MENU_1
-    elif update.message.text == '5-11 классы':
+    elif '5-11 классы' in [update.message.text, back_message]:
         await update.message.reply_text(
-            "I see! Please send me a photo of yourself, "
-            "so I know what you look like, or send /skip if you don't want to.",
+            "Выберите нужное вам действие",
             reply_markup=markup_5)
         return MENU_5
 
 
 async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print('menu_1')
+    # print('menu_1')
     """Stores the photo and asks for a location."""
     if update.message.text == 'помощь':
         await update.message.reply_text(
@@ -129,20 +119,48 @@ async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     elif update.message.text == 'телефон':
         await update.message.reply_text(
             "uiop")
+    elif update.message.text == 'вопросы':
+        await update.message.reply_text(
+            'нажмите на вопрос, чтобы получить ответ',
+            reply_markup=markup_q_1)
+        return QUE_1
     elif update.message.text == 'назад':
-        return await back(update, context)
+        return await start(update, context, back=True)
 
 
 async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print('menu_5')
+    # print('menu_5')
     if update.message.text == 'помощь1':
         await update.message.reply_text(
             "qwerty")
     elif update.message.text == 'телефон1':
         await update.message.reply_text(
             "uiop")
+    elif update.message.text == 'вопросы1':
+        await update.message.reply_text(
+            'нажмите на вопрос, чтобы получить ответ',
+            reply_markup=markup_q_5)
+        return QUE_5
     elif update.message.text == 'назад1':
-        return await back(update, context)
+        return await start(update, context, back=True)
+
+async def que_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    for que, ans in que_dct_1.items():
+        if update.message.text == que:
+            await update.message.reply_text(
+                ans,
+                reply_markup=markup_q_1)
+    if update.message.text == 'назад':
+        return await main_menu(update, context, back_message='1-4 классы')
+
+async def que_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    for que, ans in que_dct_5.items():
+        if update.message.text == que:
+            await update.message.reply_text(
+                ans,
+                reply_markup=markup_q_5)
+    if update.message.text == 'назад':
+        return await main_menu(update, context, back_message='5-11 классы')
 
 
 # async def skip_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -185,10 +203,11 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            BACK: [MessageHandler(filters.TEXT & ~filters.COMMAND, back)],
             MAIN_MENU: [MessageHandler(filters.TEXT & ~filters.COMMAND, main_menu)],
             MENU_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_1)],
             MENU_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_5)],
+            QUE_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, que_1)],
+            QUE_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, que_5)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
         allow_reentry=True
