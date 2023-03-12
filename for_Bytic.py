@@ -1,27 +1,61 @@
-from telegram.ext import Application, MessageHandler, filters, CommandHandler
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
+#!/usr/bin/env python
+# pylint: disable=unused-argument, wrong-import-position
+# This program is dedicated to the public domain under the CC0 license.
 
-BOT_TOKEN = '6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8'
+"""
+First, a few callback functions are defined. Then, those functions are passed to
+the Application and registered at their respective places.
+Then, the bot is started and runs until we press Ctrl-C on the command line.
 
-reply_keyboard = [['/start', '/help'],
-                  ['/address', '/phone'],
-                  ['/site', '/work_time']]
-markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+Usage:
+Example of a bot-user conversation using ConversationHandler.
+Send /start to initiate the conversation.
+Press Ctrl-C on the command line or send a signal to the process to stop the
+bot.
+"""
 
+import logging
 
-async def close_keyboard(update, context):
-    await update.message.reply_text(
-        "Ok",
-        reply_markup=ReplyKeyboardRemove()
+from telegram import __version__ as TG_VER
+
+try:
+    from telegram import __version_info__
+except ImportError:
+    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
+
+if __version_info__ < (20, 0, 0, "alpha", 5):
+    raise RuntimeError(
+        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
+        f"{TG_VER} version of this example, "
+        f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
 
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
-async def start(update, context):
-    await update.message.reply_text(
-        "Я бот-справочник. Какая информация вам нужна?",
-        reply_markup=markup
-    )
+MAIN_MENU, MENU_1, MENU_5, BACK = range(4)
 
+main_markup = ReplyKeyboardMarkup(
+            [["1-4 классы", "5-11 классы"]], one_time_keyboard=False
+        )
+markup_1 = ReplyKeyboardMarkup(
+            [['помощь', 'телефон', 'назад']], one_time_keyboard=False
+        )
+markup_5 = ReplyKeyboardMarkup(
+            [['помощь1', 'телефон1', 'назад1']], one_time_keyboard=False
+        )
 
 async def help(update, context):
     await update.message.reply_text(
@@ -46,19 +80,125 @@ async def work_time(update, context):
     await update.message.reply_text(
         "Время работы: круглосуточно.")
 
+async def back(update, context):
+    print('back')
+    await update.message.reply_text(
+        "Hi! My name is Professor Bot. I will hold a conversation with you. "
+        "Send /cancel to stop talking to me.\n\n"
+        "Are you a boy or a girl?",
+        reply_markup=main_markup,
+    )
+    return MAIN_MENU
 
-def main():
-    application = Application.builder().token(BOT_TOKEN).build()
-    application.add_handler(CommandHandler("address", address))
-    application.add_handler(CommandHandler("phone", phone))
-    application.add_handler(CommandHandler("site", site))
-    application.add_handler(CommandHandler("work_time", work_time))
-    application.add_handler(CommandHandler("help", help))
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("close", close_keyboard))
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    print('start')
+    """Starts the conversation and asks the user about their gender."""
+    await update.message.reply_text(
+        "Hi! My name is Professor Bot. I will hold a conversation with you. "
+        "Send /cancel to stop talking to me.\n\n"
+        "Are you a boy or a girl?",
+        reply_markup=main_markup,
+    )
+    return MAIN_MENU
+
+
+async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Stores the selected gender and asks for a photo."""
+    print('main_menu')
+    user = update.message.from_user
+    if update.message.text == '1-4 классы':
+        await update.message.reply_text(
+            "I see! Please send me a photo of yourself, "
+            "so I know what you look like, or send /skip if you don't want to.",
+            reply_markup=markup_1)
+        return MENU_1
+    elif update.message.text == '5-11 классы':
+        await update.message.reply_text(
+            "I see! Please send me a photo of yourself, "
+            "so I know what you look like, or send /skip if you don't want to.",
+            reply_markup=markup_5)
+        return MENU_5
+
+
+async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    print('menu_1')
+    """Stores the photo and asks for a location."""
+    if update.message.text == 'помощь':
+        await update.message.reply_text(
+            "qwerty")
+    elif update.message.text == 'телефон':
+        await update.message.reply_text(
+            "uiop")
+    elif update.message.text == 'назад':
+        return await back(update, context)
+
+
+async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    print('menu_5')
+    if update.message.text == 'помощь1':
+        await update.message.reply_text(
+            "qwerty")
+    elif update.message.text == 'телефон1':
+        await update.message.reply_text(
+            "uiop")
+    elif update.message.text == 'назад1':
+        return await back(update, context)
+
+
+# async def skip_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+#     """Skips the location and asks for info about the user."""
+#     user = update.message.from_user
+#     logger.info("User %s did not send a location.", user.first_name)
+#     await update.message.reply_text(
+#         "You seem a bit paranoid! At last, tell me something about yourself."
+#     )
+#
+#     return BIO
+
+
+# async def bio(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+#     """Stores the info about the user and ends the conversation."""
+#     user = update.message.from_user
+#     logger.info("Bio of %s: %s", user.first_name, update.message.text)
+#     await update.message.reply_text("Thank you! I hope we can talk again some day.")
+#
+#     return ConversationHandler.END
+
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Cancels and ends the conversation."""
+    user = update.message.from_user
+    logger.info("User %s canceled the conversation.", user.first_name)
+    await update.message.reply_text(
+        "Bye! I hope we can talk again some day.", reply_markup=ReplyKeyboardRemove()
+    )
+
+    return ConversationHandler.END
+
+
+def main() -> None:
+    """Run the bot."""
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8").build()
+
+    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", start)],
+        states={
+            BACK: [MessageHandler(filters.TEXT & ~filters.COMMAND, back)],
+            MAIN_MENU: [MessageHandler(filters.TEXT & ~filters.COMMAND, main_menu)],
+            MENU_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_1)],
+            MENU_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_5)],
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
+        allow_reentry=True
+    )
+
+    application.add_handler(conv_handler)
+
+    # Run the bot until the user presses Ctrl-C
     application.run_polling()
 
 
-# Запускаем функцию main() в случае запуска скрипта.
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
