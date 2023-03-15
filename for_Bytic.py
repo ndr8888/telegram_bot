@@ -1,8 +1,7 @@
+from db_data import db_session
 from logger import *
 from CONST import *
-from markups_and_ques import *
 from geocode import api_request
-
 from telegram import __version__ as TG_VER
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import (
@@ -26,6 +25,10 @@ if __version_info__ < (20, 0, 0, "alpha", 5):
         f"{TG_VER} version of this example, "
         f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
+
+db_session.global_init('db_data/questions.db') # инициализация бд
+
+from markups_and_ques import * # после инициализации импортируем все markupы
 
 
 # помощь
@@ -172,6 +175,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 def main() -> None:
     """Run the bot."""
+
     # передаем токен и создаем экземпляр класса Application
     application = Application.builder().token(TOKEN).build()
 
