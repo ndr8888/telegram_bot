@@ -5,14 +5,14 @@ main_markup = ReplyKeyboardMarkup(
     [["1-4 классы", "5-11 классы"]], one_time_keyboard=False
 )
 markup_1 = ReplyKeyboardMarkup(
-    [['Расписание', 'Телефон'],
-     ['Вопросы', 'Назад'],
-     ['Адрес']], one_time_keyboard=False
+    [['Расписание', 'Контакты', 'Стоимость'],
+     ['Вопросы', 'Адрес'],
+     ['Назад']], one_time_keyboard=False
 )
 markup_5 = ReplyKeyboardMarkup(
-    [['Расписание', 'Телефон'],
-     ['Вопросы', 'Назад'],
-     ['Адрес']], one_time_keyboard=False)
+    [['Расписание', 'Контакты', 'Стоимость'],
+     ['Вопросы', 'Адрес'],
+     ['Назад']], one_time_keyboard=False)
 
 # que_dct_1 = que_dct_5 = {q1[0][1]: q1[0][2], q2[0][1]: q2[0][2], q3[0][1]: q3[0][2], q4[0][1]: q4[0][2],
 #                          q5[0][1]: q5[0][2], q6[0][1]: q6[0][2], q7[0][1]: q7[0][2], q8[0][1]: q8[0][2],

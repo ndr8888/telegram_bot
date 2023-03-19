@@ -68,9 +68,12 @@ async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     if update.message.text == 'Расписание':
         await update.message.reply_text(
             f"{ordinary}")
-    elif update.message.text == 'Телефон':
+    elif update.message.text == 'Контакты':
         await update.message.reply_text(
-            "+84958510367")
+            "Телефон: +84958510367")
+    elif update.message.text == 'Стоимость':
+        await update.message.reply_text(
+            "Стоимость - 2500 за день лагеря")
     elif update.message.text == 'Вопросы':
         await update.message.reply_text(
             'Нажмите на вопрос, чтобы получить ответ',
@@ -98,9 +101,12 @@ async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     if update.message.text == 'Расписание':
         await update.message.reply_text(
             f"{ordinary}")
-    elif update.message.text == 'Телефон':
+    elif update.message.text == 'Контакты':
         await update.message.reply_text(
-            "+84958510367")
+            "Телефон: +84958510367")
+    elif update.message.text == 'Стоимость':
+        await update.message.reply_text(
+            "Стоимость - 2500 за день лагеря")
     elif update.message.text == 'Вопросы':
         await update.message.reply_text(
             'Нажмите на вопрос, чтобы получить ответ',
