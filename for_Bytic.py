@@ -65,9 +65,9 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE, back_mes
 
 
 async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    if update.message.text == 'Помощь':
+    if update.message.text == 'Расписание':
         await update.message.reply_text(
-            "qwerty")
+            f"{ordinary}")
     elif update.message.text == 'Телефон':
         await update.message.reply_text(
             "+84958510367")
@@ -95,20 +95,20 @@ async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     # print('menu_5')
-    if update.message.text == 'Помощь1':
+    if update.message.text == 'Расписание':
         await update.message.reply_text(
-            "qwerty")
-    elif update.message.text == 'Телефон1':
+            f"{ordinary}")
+    elif update.message.text == 'Телефон':
         await update.message.reply_text(
             "+84958510367")
-    elif update.message.text == 'Вопросы1':
+    elif update.message.text == 'Вопросы':
         await update.message.reply_text(
             'Нажмите на вопрос, чтобы получить ответ',
             reply_markup=markup_q_5)
         return QUE_5
-    elif update.message.text == 'Назад1':
+    elif update.message.text == 'Назад':
         return await start(update, context, back=True)
-    elif update.message.text == 'Адрес1':
+    elif update.message.text == 'Адрес':
         response = await get_response(geocoder_uri, params={
             "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
             "format": "json",
