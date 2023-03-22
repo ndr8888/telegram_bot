@@ -82,6 +82,7 @@ async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def groups_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    # сохраняю информацию в словарь, чтобы на основе выбранной группы выводить описание
     context.chat_data['groups'] = update.message.text
     if update.message.text == '1-я смена (29 мая - 9 июня)':
         await update.message.reply_text('Выберите интересующую Вас смену', reply_markup=markup_1_1)
@@ -95,7 +96,7 @@ async def groups_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 
 async def menu_1_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    # нужно разделить на два описания
+    # вывожу описание в зависимости от выбранной группы. Определяется в функции groups_1
     if update.message.text == 'Описание':
         if context.chat_data['groups'] == '1-я смена (29 мая - 9 июня)':
             await update.message.reply_text(
