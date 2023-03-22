@@ -139,17 +139,38 @@ async def menu_1_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def menu_1_2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.chat_data['course'] = update.message.text
     if update.message.text == 'Каллиграфия':
-        await update.message.reply_text('Тут будет информация о курсе Каллиграфии')
+        await update.message.reply_text('Пожалуйста, выберите действие', reply_markup=markup_courses)
+        return COURSES
     elif update.message.text == 'Курс1':
-        await update.message.reply_text('Тут будет информация о курсе1')
+        await update.message.reply_text('Пожалуйста, выберите действие', reply_markup=markup_courses)
+        return COURSES
     elif update.message.text == 'Курс2':
-        await update.message.reply_text('Тут будет информация о курсе2')
+        await update.message.reply_text('Пожалуйста, выберите действие', reply_markup=markup_courses)
+        return COURSES
     elif update.message.text == 'Назад':
         return await start(update, context, back=True)
     else:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующий Вас курс")
+
+
+async def courses(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if update.message.text == 'Описание':
+        if context.chat_data['course'] == 'Каллиграфия':
+            await update.message.reply_text('Тут будет информация о курсе Каллиграфии')
+        elif context.chat_data['course'] == 'Курс1':
+            await update.message.reply_text('Тут будет информация о курсе1')
+        elif context.chat_data['course'] == 'Курс2':
+            await update.message.reply_text('Тут будет информация о курсе2')
+    elif update.message.text == 'Записаться на курс':
+        await update.message.reply_text('Записаться на курс можно будет по ссылке: *тут будет ссылка*')
+    elif update.message.text == 'Назад':
+        return await start(update, context, back=True)
+    else:
+        await update.message.reply_text(
+            "Я Вас не понимаю☹ Пожалуйста, выберите интересующее Вас действие")
 
 
 async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -196,9 +217,6 @@ async def que_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
                 reply_markup=markup_q_1)
     if update.message.text == 'Назад':
         return await main_menu(update, context, back_message='1-4 классы')
-    else:
-        await update.message.reply_text(
-            "Данного вопроса нет в списках☹ Пожалуйста, выберите интересующий Вас вопрос")
 
 
 async def que_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -209,9 +227,6 @@ async def que_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
                 reply_markup=markup_q_5)
     if update.message.text == 'Назад':
         return await main_menu(update, context, back_message='5-11 классы')
-    else:
-        await update.message.reply_text(
-            "Данного вопроса нет в списках☹ Пожалуйста, выберите интересующий Вас вопрос")
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -236,9 +251,10 @@ def main() -> None:
         states={
             MAIN_MENU: [MessageHandler(filters.TEXT & ~filters.COMMAND, main_menu)],  # главное меню
             MENU_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_1)],  # выбор для 1-4 класса
-            GROUPS_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, groups_1)],
+            GROUPS_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, groups_1)],  # выбор смены
             MENU_1_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_1_1)],  # летние программы
             MENU_1_2: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_1_2)],  # летние курсы
+            COURSES: [MessageHandler(filters.TEXT & ~filters.COMMAND, courses)],
             MENU_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_5)],  # летние программы 5-11
             QUE_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, que_1)],  # вопросы 1-4
             QUE_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, que_5)],  # вопросы 5-11

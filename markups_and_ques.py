@@ -7,7 +7,7 @@ main_markup = ReplyKeyboardMarkup(
 
 # предлагает выбрать смену
 groups = ReplyKeyboardMarkup([['1-я смена (29 мая - 9 июня)'],
-                             ['2-я смена (13 июня - 23 июня)']], one_time_keyboard=False)
+                              ['2-я смена (13 июня - 23 июня)']], one_time_keyboard=False)
 
 # меню с выбором действий для 1-4 классов
 markup_1 = ReplyKeyboardMarkup(
@@ -32,6 +32,10 @@ markup_5 = ReplyKeyboardMarkup(
      ['Вопросы', 'Адрес'],
      ['Назад']], one_time_keyboard=False)
 
+markup_courses = ReplyKeyboardMarkup(
+    [['Описание'],
+     ['Записаться на курс'],
+     ['Назад']], one_time_keyboard=False)
 
 que_dct_1 = que_dct_5 = get_questions()  # получение данных из бд
 markup_q_1 = markup_q_5 = ReplyKeyboardMarkup([['Назад']] + list(map(lambda x: [x], que_dct_1)),
