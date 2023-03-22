@@ -82,6 +82,7 @@ async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def groups_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    context.chat_data['groups'] = update.message.text
     if update.message.text == '1-я смена (29 мая - 9 июня)':
         await update.message.reply_text('Выберите интересующую Вас смену', reply_markup=markup_1_1)
         return MENU_1_1
@@ -96,8 +97,12 @@ async def groups_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 async def menu_1_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     # нужно разделить на два описания
     if update.message.text == 'Описание':
-        await update.message.reply_text(
-            f"{desk_1}")
+        if context.chat_data['groups'] == '1-я смена (29 мая - 9 июня)':
+            await update.message.reply_text(
+                f"{desk_1}")
+        elif context.chat_data['groups'] == '2-я смена (13 июня - 23 июня)':
+            await update.message.reply_text(
+                f"{desk_2}")
     elif update.message.text == 'Расписание':
         await update.message.reply_text(
             f"{ordinary}")
