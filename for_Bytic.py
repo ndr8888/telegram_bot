@@ -119,7 +119,9 @@ async def menu_1_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             reply_markup=markup_q_1)
         return QUE_1
     elif update.message.text == 'Назад':
-        return await start(update, context, back=True)
+        await update.message.reply_text(
+            'Вы вернулись в предыдущий раздел', reply_markup=markup_1)
+        return MENU_1
     elif update.message.text == 'Адрес':
         response = await get_response(geocoder_uri, params={
             "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
@@ -167,7 +169,9 @@ async def courses(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     elif update.message.text == 'Записаться на курс':
         await update.message.reply_text('Записаться на курс можно будет по ссылке: *тут будет ссылка*')
     elif update.message.text == 'Назад':
-        return await start(update, context, back=True)
+        await update.message.reply_text(
+            'Вы вернулись в предыдущий раздел', reply_markup=markup_1_2)
+        return MENU_1_2
     else:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующее Вас действие")
@@ -213,10 +217,11 @@ async def que_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     for que, ans in que_dct_1.items():
         if update.message.text == que:
             await update.message.reply_text(
-                ans,
-                reply_markup=markup_q_1)
+                ans)
     if update.message.text == 'Назад':
-        return await main_menu(update, context, back_message='1-4 классы')
+        await update.message.reply_text(
+            'Вы вернулись в предыдущий раздел', reply_markup=markup_1_1)
+        return MENU_1_1
 
 
 async def que_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
