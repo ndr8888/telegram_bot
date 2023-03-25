@@ -123,18 +123,12 @@ async def menu_1_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             'Вы вернулись в предыдущий раздел', reply_markup=markup_1)
         return MENU_1
     elif update.message.text == 'Адрес':
-        response = await get_response(geocoder_uri, params={
-            "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
-            "format": "json",
-            "geocode": bytic_address
-        })
-        await context.bot.send_photo(
-            update.message.chat_id,  # Идентификатор чата. Куда посылать картинку.
-            # Ссылка на static API, по сути, ссылка на картинку.
-            # Телеграму можно передать прямо её, не скачивая предварительно карту.
-            api_request(response),
-            caption=bytic_address
-        )
+        context.chat_data['address'] = 1
+        await update.message.reply_text(
+            'Выберите филиал Байтика',
+            reply_markup=markup_address)
+
+        return ADDRESS
     else:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующий Вас вопрос")
@@ -152,7 +146,9 @@ async def menu_1_2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await update.message.reply_text('Пожалуйста, выберите действие', reply_markup=markup_courses)
         return COURSES
     elif update.message.text == 'Назад':
-        return await start(update, context, back=True)
+        await update.message.reply_text(
+            'Вы вернулись в предыдущий раздел', reply_markup=markup_1)
+        return MENU_1
     else:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующий Вас курс")
@@ -176,6 +172,46 @@ async def courses(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующее Вас действие")
 
+async def address_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    print('c', update.message.text)
+    if update.message.text == 'Сиреневый бульвар':
+        response = await get_response(geocoder_uri, params={
+            "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+            "format": "json",
+            "geocode": bytic_address_1
+        })
+        await context.bot.send_photo(
+            update.message.chat_id,  # Идентификатор чата. Куда посылать картинку.
+            # Ссылка на static API, по сути, ссылка на картинку.
+            # Телеграму можно передать прямо её, не скачивая предварительно карту.
+            api_request(response),
+            caption=bytic_address_1
+        )
+    elif update.message.text == 'Микрорайон В':
+        response = await get_response(geocoder_uri, params={
+            "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+            "format": "json",
+            "geocode": bytic_address_2
+        })
+        await context.bot.send_photo(
+            update.message.chat_id,  # Идентификатор чата. Куда посылать картинку.
+            # Ссылка на static API, по сути, ссылка на картинку.
+            # Телеграму можно передать прямо её, не скачивая предварительно карту.
+            api_request(response),
+            caption=bytic_address_2
+        )
+    elif update.message.text == 'Назад':
+        if context.chat_data['address'] == 1:
+            await update.message.reply_text(
+                'Вы вернулись в предыдущий раздел', reply_markup=markup_1_1)
+            return MENU_1_1
+        else:
+            await update.message.reply_text(
+                'Вы вернулись в предыдущий раздел', reply_markup=markup_5)
+            return MENU_5
+    else:
+        await update.message.reply_text(
+            "Я Вас не понимаю☹ Пожалуйста, выберите интересующий Вас курс")
 
 async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     # print('menu_5')
@@ -196,18 +232,12 @@ async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     elif update.message.text == 'Назад':
         return await start(update, context, back=True)
     elif update.message.text == 'Адрес':
-        response = await get_response(geocoder_uri, params={
-            "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
-            "format": "json",
-            "geocode": bytic_address
-        })
-        await context.bot.send_photo(
-            update.message.chat_id,  # Идентификатор чата. Куда посылать картинку.
-            # Ссылка на static API, по сути, ссылка на картинку.
-            # Телеграму можно передать прямо её, не скачивая предварительно карту.
-            api_request(response),
-            caption=bytic_address
-        )
+        context.chat_data['address'] = 2
+        await update.message.reply_text(
+            'Выберите филиал Байтика',
+            reply_markup=markup_address)
+
+        return ADDRESS
     else:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующий Вас вопрос")
@@ -263,6 +293,7 @@ def main() -> None:
             MENU_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_5)],  # летние программы 5-11
             QUE_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, que_1)],  # вопросы 1-4
             QUE_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, que_5)],  # вопросы 5-11
+            ADDRESS: [MessageHandler(filters.TEXT & ~filters.COMMAND, address_menu)]
         },
         fallbacks=[CommandHandler("cancel", cancel)],
         allow_reentry=True

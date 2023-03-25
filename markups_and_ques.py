@@ -37,6 +37,11 @@ markup_courses = ReplyKeyboardMarkup(
      ['Записаться на курс'],
      ['Назад']], one_time_keyboard=False)
 
+markup_address = ReplyKeyboardMarkup(
+    [['Сиреневый бульвар'],
+     ['Микрорайон В'],
+     ['Назад']], one_time_keyboard=False)
+
 que_dct_1 = que_dct_5 = get_questions()  # получение данных из бд
 markup_q_1 = markup_q_5 = ReplyKeyboardMarkup([['Назад']] + list(map(lambda x: [x], que_dct_1)),
                                               one_time_keyboard=False)
