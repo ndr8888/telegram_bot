@@ -28,8 +28,7 @@ markup_1_2 = ReplyKeyboardMarkup(
 
 # пока что просто вопросы для 5-11 классов
 markup_5 = ReplyKeyboardMarkup(
-    [['Расписание', 'Контакты', 'Стоимость'],
-     ['Вопросы', 'Адрес'],
+    [['Летние курсы'],
      ['Назад']], one_time_keyboard=False)
 
 markup_courses = ReplyKeyboardMarkup(
@@ -39,8 +38,8 @@ markup_courses = ReplyKeyboardMarkup(
 
 markup_address = ReplyKeyboardMarkup(
     [['Сиреневый бульвар'],
-     ['Микрорайон В'],
      ['Назад']], one_time_keyboard=False)
+# ['Микрорайон В'],
 
 que_dct_1 = que_dct_5 = get_questions()  # получение данных из бд
 markup_q_1 = markup_q_5 = ReplyKeyboardMarkup([['Назад']] + list(map(lambda x: [x], que_dct_1)),

@@ -73,6 +73,7 @@ async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         return GROUPS_1
     elif update.message.text == 'Летние курсы':
         await update.message.reply_text('Выберите интересующий Вас курс', reply_markup=markup_1_2)
+        context.chat_data['courses'] = 1
         return MENU_1_2
     elif update.message.text == 'Назад':
         return await start(update, context, back=True)
@@ -85,10 +86,10 @@ async def groups_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     # сохраняю информацию в словарь, чтобы на основе выбранной группы выводить описание
     context.chat_data['groups'] = update.message.text
     if update.message.text == '1-я смена (29 мая - 9 июня)':
-        await update.message.reply_text('Выберите интересующую Вас смену', reply_markup=markup_1_1)
+        await update.message.reply_text('Выберите интересующую Вас информацию', reply_markup=markup_1_1)
         return MENU_1_1
     elif update.message.text == '2-я смена (13 июня - 23 июня)':
-        await update.message.reply_text('Выберите интересующую Вас смену', reply_markup=markup_1_1)
+        await update.message.reply_text('Выберите интересующую Вас информацию', reply_markup=markup_1_1)
         return MENU_1_1
     else:
         await update.message.reply_text(
@@ -98,21 +99,17 @@ async def groups_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 async def menu_1_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     # вывожу описание в зависимости от выбранной группы. Определяется в функции groups_1
     if update.message.text == 'Описание':
-        if context.chat_data['groups'] == '1-я смена (29 мая - 9 июня)':
-            await update.message.reply_text(
-                f"{desk_1}")
-        elif context.chat_data['groups'] == '2-я смена (13 июня - 23 июня)':
-            await update.message.reply_text(
-                f"{desk_2}")
+        await update.message.reply_text(
+            f"{desk_1}")
     elif update.message.text == 'Расписание':
         await update.message.reply_text(
             f"{ordinary}")
     elif update.message.text == 'Контакты':
         await update.message.reply_text(
-            "Телефон: +84959559470\nЭлектронная почта: bytic@bytic.ru")
+            "Телефон: +74959559470\nЭлектронная почта: bytic@bytic.ru")
     elif update.message.text == 'Стоимость':
         await update.message.reply_text(
-            "Стоимость - 2500 за день лагеря")
+            "Стоимость - 2500 за день лагеря; обеды оплачиваются отдельно")
     elif update.message.text == 'Вопросы':
         await update.message.reply_text(
             'Нажмите на вопрос, чтобы получить ответ',
@@ -146,9 +143,14 @@ async def menu_1_2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await update.message.reply_text('Пожалуйста, выберите действие', reply_markup=markup_courses)
         return COURSES
     elif update.message.text == 'Назад':
-        await update.message.reply_text(
-            'Вы вернулись в предыдущий раздел', reply_markup=markup_1)
-        return MENU_1
+        if context.chat_data['courses'] == 1:
+            await update.message.reply_text(
+                'Вы вернулись в предыдущий раздел', reply_markup=markup_1)
+            return MENU_1
+        else:
+            await update.message.reply_text(
+                'Вы вернулись в предыдущий раздел', reply_markup=markup_5)
+            return MENU_5
     else:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующий Вас курс")
@@ -172,8 +174,8 @@ async def courses(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующее Вас действие")
 
+
 async def address_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print('c', update.message.text)
     if update.message.text == 'Сиреневый бульвар':
         response = await get_response(geocoder_uri, params={
             "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
@@ -213,6 +215,7 @@ async def address_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующий Вас курс")
 
+
 async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     # print('menu_5')
     if update.message.text == 'Расписание':
@@ -220,7 +223,7 @@ async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             f"{ordinary}")
     elif update.message.text == 'Контакты':
         await update.message.reply_text(
-            "Телефон: +84959559470\nЭлектронная почта: bytic@bytic.ru")
+            "Телефон: +74959559470\nЭлектронная почта: bytic@bytic.ru")
     elif update.message.text == 'Стоимость':
         await update.message.reply_text(
             "Стоимость - 2500 за день лагеря")
@@ -236,8 +239,11 @@ async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await update.message.reply_text(
             'Выберите филиал Байтика',
             reply_markup=markup_address)
-
         return ADDRESS
+    elif update.message.text == 'Летние курсы':
+        await update.message.reply_text('Выберите интересующий Вас курс', reply_markup=markup_1_2)
+        context.chat_data['courses'] = 5
+        return MENU_1_2
     else:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующий Вас вопрос")
