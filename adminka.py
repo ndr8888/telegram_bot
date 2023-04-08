@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from db_data import db_session
 from db_data.questions import Questions
-from game import run_game
+from game.game import run_game
 import sqlite3
 
 
@@ -70,7 +70,7 @@ class Ui_Form(object):
         self.label_8.setObjectName("label_8")
 
         self.pushButton_game = QtWidgets.QPushButton(Form)
-        self.pushButton_game.setGeometry(QtCore.QRect(0, 0, 411, 51))
+        self.pushButton_game.setGeometry(QtCore.QRect(0, 25, 200, 51))
         self.pushButton_game.setStyleSheet("background-color: rgba(210, 220, 210, 150);\n"
                                       "border: 1px solid rgba(210, 220, 210, 180);\n"
                                       "border-radius: 10px;\n"
