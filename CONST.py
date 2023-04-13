@@ -1,3 +1,6 @@
+TOKEN = '6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8'  # токен бота
+
+
 bytic_address_1 = 'Сиреневый бульвар, 11, Троицк, Москва'  # адрес байтика на сиреневом
 bytic_address_2 = 'микрорайон В, 39, Троицк, Москва'  # адрес байтика на сиреневом
 geocoder_uri = "http://geocode-maps.yandex.ru/1.x/"  # для запроса статик апи
@@ -9,8 +12,11 @@ GROUPS_1 = 'groups_1_4'  # для вызова ф-ции groups_1
 COURSES = 121  # для ф-ции курсов 1-4 классов
 ADDRESS = 'address'
 
-TOKEN = '6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8'  # токен бота
 
+SECRET_MAIN_MENU = 'secret_1'
+REGISTER = 'register'
+GO_TO_FIRST_MONSTER = 'Go-go-go'
+FIGHT = 'fight'
 
 # расписание нахождения в Байтике для смен
 with open('ordinary.txt', 'r', encoding='utf-8') as ordinar:
