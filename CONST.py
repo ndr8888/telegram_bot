@@ -9,7 +9,7 @@ GROUPS_1 = 'groups_1_4'  # для вызова ф-ции groups_1
 COURSES = 121  # для ф-ции курсов 1-4 классов
 ADDRESS = 'address'
 
-TOKEN = '5846392119:AAHq6hs73GVd6UOPw6rQksc18y2QhRK2_Qw'  # токен бота
+TOKEN = '6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8'  # токен бота
 
 
 # расписание нахождения в Байтике для смен
