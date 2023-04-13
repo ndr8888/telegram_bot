@@ -1,22 +1,46 @@
 from telegram import ReplyKeyboardMarkup
-from work_with_db import *
+from db_data.work_with_db import get_questions
 
 main_markup = ReplyKeyboardMarkup(
     [["1-4 классы", "5-11 классы"]], one_time_keyboard=False
 )
-markup_1 = ReplyKeyboardMarkup(
-    [['Помощь', 'Телефон'],
-     ['Вопросы', 'Назад'],
-     ['Адрес']], one_time_keyboard=False
-)
-markup_5 = ReplyKeyboardMarkup(
-    [['Помощь1', 'Телефон1'],
-     ['Вопросы1', 'Назад1'],
-     ['Адрес1']], one_time_keyboard=False)
 
-que_dct_1 = que_dct_5 = {q1[0][1]: q1[0][2], q2[0][1]: q2[0][2], q3[0][1]: q3[0][2], q4[0][1]: q4[0][2],
-                         q5[0][1]: q5[0][2], q6[0][1]: q6[0][2], q7[0][1]: q7[0][2], q8[0][1]: q8[0][2],
-                         q9[0][1]: q9[0][2], q10[0][1]: q10[0][2], q11[0][1]: q11[0][2], q12[0][1]: q12[0][2],
-                         q13[0][1]: q13[0][2], q14[0][1]: q14[0][2], q15[0][1]: q15[0][2]}
-markup_q_1 = markup_q_5 = ReplyKeyboardMarkup(list(map(lambda x: [x], que_dct_1)) + [['Назад']],
+# предлагает выбрать смену
+groups = ReplyKeyboardMarkup([['1-я смена (29 мая - 9 июня)'],
+                              ['2-я смена (13 июня - 23 июня)']], one_time_keyboard=False)
+
+# меню с выбором действий для 1-4 классов
+markup_1 = ReplyKeyboardMarkup(
+    [['Летние образовательные смены'],
+     ['Летние курсы'],
+     ['Назад']], one_time_keyboard=False)
+
+# меню вопросов для летних образовательных программ для 1-4 классов
+markup_1_1 = ReplyKeyboardMarkup(
+    [['Описание', 'Стоимость', 'Расписание'],
+     ['Вопросы', 'Адрес', 'Контакты'],
+     ['Назад']], one_time_keyboard=False)
+
+# меню вопросов для летних курсов
+markup_1_2 = ReplyKeyboardMarkup(
+    [['Каллиграфия', 'Курс1', 'Курс2'],
+     ['Назад']], one_time_keyboard=False)
+
+# пока что просто вопросы для 5-11 классов
+markup_5 = ReplyKeyboardMarkup(
+    [['Летние курсы'],
+     ['Назад']], one_time_keyboard=False)
+
+markup_courses = ReplyKeyboardMarkup(
+    [['Описание'],
+     ['Записаться на курс'],
+     ['Назад']], one_time_keyboard=False)
+
+markup_address = ReplyKeyboardMarkup(
+    [['Сиреневый бульвар'],
+     ['Назад']], one_time_keyboard=False)
+# ['Микрорайон В'],
+
+que_dct_1 = que_dct_5 = get_questions()  # получение данных из бд
+markup_q_1 = markup_q_5 = ReplyKeyboardMarkup([['Назад']] + list(map(lambda x: [x], que_dct_1)),
                                               one_time_keyboard=False)
