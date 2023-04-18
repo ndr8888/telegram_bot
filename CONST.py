@@ -1,5 +1,4 @@
-# TOKEN = '6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8'  # токен бота
-TOKEN = '5846392119:AAHq6hs73GVd6UOPw6rQksc18y2QhRK2_Qw'
+TOKEN = '6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8'  # токен бота
 
 bytic_address_1 = 'Сиреневый бульвар, 11, Троицк, Москва'  # адрес байтика на сиреневом
 bytic_address_2 = 'микрорайон В, 39, Троицк, Москва'  # адрес байтика на сиреневом
