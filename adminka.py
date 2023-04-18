@@ -1,8 +1,10 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+import sqlite3
+
+from PyQt5 import QtCore, QtWidgets
+
 from db_data import db_session
 from db_data.questions import Questions
 from game.game import run_game
-import sqlite3
 
 
 class Ui_Form(object):
@@ -72,12 +74,12 @@ class Ui_Form(object):
         self.pushButton_game = QtWidgets.QPushButton(Form)
         self.pushButton_game.setGeometry(QtCore.QRect(0, 25, 200, 51))
         self.pushButton_game.setStyleSheet("background-color: rgba(210, 220, 210, 150);\n"
-                                      "border: 1px solid rgba(210, 220, 210, 180);\n"
-                                      "border-radius: 10px;\n"
-                                      "color: black;\n"
-                                      "font-weight: bold;\n"
-                                      "font-size: 16px;\n"
-                                      "")
+                                           "border: 1px solid rgba(210, 220, 210, 180);\n"
+                                           "border-radius: 10px;\n"
+                                           "color: black;\n"
+                                           "font-weight: bold;\n"
+                                           "font-size: 16px;\n"
+                                           "")
         self.pushButton_game.setObjectName("pushButton_game")
 
         self.retranslateUi(Form)
@@ -109,6 +111,7 @@ class Ui_Form(object):
                                         "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:600;\">Содержимое базы данных:</span></p></body></html>"))
 
         self.pushButton_game.setText(_translate("Form", "игра"))
+
     def add(self):
         db_session.global_init('db_data/questions.db')
         db_sess = db_session.create_session()
@@ -150,6 +153,7 @@ class Ui_Form(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Form = QtWidgets.QWidget()
     ui = Ui_Form()
