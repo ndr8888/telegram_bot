@@ -51,5 +51,7 @@ secret_markup_1 = ReplyKeyboardMarkup([['Ничего себе! Конечно �
 
 markup_go_to_moster = ReplyKeyboardMarkup([['Вперёд!'], ['Мне нужно немного времени']])
 markup_go_to_moster_without_run = ReplyKeyboardMarkup([['Вперёд!']])
-
 markup_for_fight = ReplyKeyboardMarkup([['Атаковать'], ['Бежать']])
+main_game_markup = ReplyKeyboardMarkup([['Отправиться на охоту'], ['Инвентарь', 'Профиль'], ['Таверна']])
+continue_markup = ReplyKeyboardMarkup([['Продолжить']])
+barmen_markup = ReplyKeyboardMarkup([['Магазин'], ['Задание']])

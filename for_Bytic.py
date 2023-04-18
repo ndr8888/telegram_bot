@@ -291,13 +291,13 @@ async def secret_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f'Приветствую, {update.message.chat.last_name} {update.message.chat.first_name}. '
         f'Ты знаешь тайный пароль! Тебе доступен уникальный набор функций! Так используй же их!',
         reply_markup=secret_markup_1)
-    return SECRET_MAIN_MENU
+    return SECRET_START_MENU
 
 
 async def text_play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == 'Ой, нет, что-то боязно. Верни меня обратно!':
         await update.message.reply_text('Конечно-конечно! Всё вернётся на круги своя, просто '
-                                        'напиши /start', reply_markup=markup_1)
+                                        'напиши /start', reply_markup=ReplyKeyboardRemove())
         return ConversationHandler.END
     if update.message.text == 'Ничего себе! Конечно использовать!':
         await update.message.reply_text('Тогда мы начинаем! Как тебя называть?',
@@ -310,11 +310,11 @@ async def text_play(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     player = Player(update.message.text)
-    context.chat_data['Player'] = player
+    context.chat_data['player'] = player
     await update.message.reply_text(f'Чтож, {update.message.text}, вот твой профиль:\n'
-                                    f'Сила: {context.chat_data["Player"].force}\nЛовкость: {context.chat_data["Player"].agility}\n'
-                                    f'Телосложение: {context.chat_data["Player"].physique}\nЗдоровье: {context.chat_data["Player"].hp}\n'
-                                    f'Урон: {context.chat_data["Player"].damage}\nОружие:{context.chat_data["Player"].weapon}\n'
+                                    f'Сила: {context.chat_data["player"].force}\nЛовкость: {context.chat_data["player"].agility}\n'
+                                    f'Телосложение: {context.chat_data["player"].physique}\nЗдоровье: {context.chat_data["player"].hp}\n'
+                                    f'Урон: {context.chat_data["player"].damage}\nОружие: {context.chat_data["player"].weapon}\n'
                                     f'Пойдём проверим какого-нибудь монстра на прочность?',
                                     reply_markup=markup_go_to_moster)
     return GO_TO_FIRST_MONSTER
@@ -323,34 +323,107 @@ async def register(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def go_to_first_monster(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == 'Мне нужно немного времени':
         await update.message.reply_text(
-            f'Хорошо, пока что посмотри на свои характеристики и подумай\n\n{context.chat_data["Player"].nick}, вот твой профиль:\n'
-            f'Сила: {context.chat_data["Player"].force}\nЛовкость: {context.chat_data["Player"].agility}\n'
-            f'Телосложение: {context.chat_data["Player"].physique}\nЗдоровье: {context.chat_data["Player"].hp}\n'
-            f'Урон: {context.chat_data["Player"].damage}\nОружие: {context.chat_data["Player"].weapon}\n'
+            f'Хорошо, пока что посмотри на свои характеристики и подумай\n\n{context.chat_data["player"].nick}, вот твой профиль:\n'
+            f'Сила: {context.chat_data["player"].force}\nЛовкость: {context.chat_data["player"].agility}\n'
+            f'Телосложение: {context.chat_data["player"].physique}\nЗдоровье: {context.chat_data["player"].hp}\n'
+            f'Урон: {context.chat_data["player"].damage}\nОружие: {context.chat_data["player"].weapon}\n'
             f'Пойдём проверим какого-нибудь монстра на прочность?',
             reply_markup=markup_go_to_moster_without_run)
     elif update.message.text == 'Вперёд!':
+        context.chat_data['last_message'] = update.message.text
         await update.message.reply_text('Желаю тебе удачи, будет сложно, но ты - ты справишься!!!')
+        await update.message.reply_text('Перед тобой небольшой монстрик. Бой начался!', reply_markup=markup_for_fight)
         return FIGHT
     else:
         await update.message.reply_text('Не время для разговоров! Пора идти!')
 
 
 async def fight(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.chat_data['enemy'] = Monster('weak')
-    await update.message.reply_text('Бой начался! Действуйте!', reply_markup=markup_for_fight)
-    while context.chat_data['enemy'].hp > 0 and context.chat_data['player'].hp > 0:
+    if context.chat_data['last_message'] == 'Вперёд!':
+        context.chat_data['enemy'] = Monster('weak')
+        context.chat_data['spawn'] = 0
+    context.chat_data['last_id'] = update.message.id
+    if context.chat_data['player'].hp > 0 and context.chat_data['enemy'].hp > 0:
         if update.message.text == 'Атаковать':
             context.chat_data['enemy'].hp -= context.chat_data['player'].damage
             context.chat_data['player'].hp -= context.chat_data['enemy'].damage
-            await update.message.reply_text(f"Вы нанесли противнику {context.chat_data['player'].damage} урона. У него осталось {context.chat_data['enemy'].hp} хп")
+            if context.chat_data['enemy'].hp < 0:
+                context.chat_data['enemy'].hp = 0
             await update.message.reply_text(
-                f"Противник нанёс Вам {context.chat_data['enemy'].damage} урона. У Вас осталось {context.chat_data['player'].hp} хп")
+                f"Вы нанесли противнику {context.chat_data['player'].damage} урона. У него осталось {context.chat_data['enemy'].hp} хп")
+            if context.chat_data['enemy'].hp > 0:
+                await update.message.reply_text(
+                    f"Противник нанёс Вам {context.chat_data['enemy'].damage} урона. У Вас осталось {context.chat_data['player'].hp} хп")
         else:
             regen = randint(1, 2)
-            await update.message.reply_text(
-                f"Вы восстанавливаете {regen} здоровья, но монстр догоняет!!!")
-            context.chat_data['player'].hp += regen
+            if context.chat_data['player'].hp != context.chat_data['player'].max_hp:
+                if context.chat_data['player'].hp + regen > context.chat_data['player'].max_hp:
+                    context.chat_data['player'].hp = context.chat_data['player'].max_hp
+                else:
+                    context.chat_data['player'].hp += regen
+                await update.message.reply_text(
+                    f"Вы восстанавливаете {regen} здоровья и теперь его у вас {context.chat_data['player'].hp}, но монстр догоняет!!!")
+            else:
+                await update.message.reply_text(
+                    f"У вас максимальное количество здоровья, но монстр уже близко!")
+    if context.chat_data['enemy'].hp == 0:
+        await update.message.reply_text(
+            f'Это было невероятно трудно, но ты справился! Вы получили: {", ".join([" - ".join([key, str(context.chat_data["enemy"].drop[key])]) for key in context.chat_data["enemy"].drop.keys()])}',
+            reply_markup=continue_markup)
+        for loot in context.chat_data['enemy'].drop.keys():
+            if loot in context.chat_data['player'].inventory.keys():
+                context.chat_data['player'].inventory[loot] += context.chat_data['enemy'].drop[loot]
+            else:
+                context.chat_data['player'].inventory[loot] = context.chat_data['enemy'].drop[loot]
+        context.chat_data.pop('enemy', None)
+        return MAIN_GAME_MENU
+    elif context.chat_data['player'].hp == 0:
+        await update.message.reply_text(
+            'Ты погиб. Чтож, у всех бывают неудачи, что поделать. Я тебя спас, но я не всегда буду рядом')
+        return MAIN_GAME_MENU
+    context.chat_data['last_message'] = update.message.text
+
+
+async def game_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.text == 'Продолжить':
+        await update.message.reply_text(
+            f'Поздравляю тебя, {context.chat_data["player"].nick}, ты прошел курс молодого охотника и теперь готов ко всему. Дальше ты будешь действовать сам, и, кто знает, возможно, тебя однажды возьмут к нам в Гильдию?',
+            reply_markup=main_game_markup)
+        context.chat_data['last_message'] = ''
+    if update.message.text == 'Инвентарь':
+        await update.message.reply_text(
+            f'Ваш инвентарь: {", ".join([" - ".join([key, str(context.chat_data["player"].inventory[key])]) for key in context.chat_data["player"].inventory.keys()])}')
+    elif update.message.text == 'Профиль':
+        await update.message.reply_text(f'Вот твой профиль:\n'
+                                        f'Сила: {context.chat_data["player"].force}\nЛовкость: {context.chat_data["player"].agility}\n'
+                                        f'Телосложение: {context.chat_data["player"].physique}\nЗдоровье: {context.chat_data["player"].hp}\n'
+                                        f'Урон: {context.chat_data["player"].damage}\nОружие: {context.chat_data["player"].weapon}\n'
+                                        f'Активные задания: {", ".join(context.chat_data["player"].kvests)}')
+    elif update.message.text == 'Таверна':
+        await update.message.reply_text(
+            f'Владелец: — Привет, {context.chat_data["player"].nick}. Дело ищешь или желаешь посмотреть на товар?',
+            reply_markup=barmen_markup)
+        return BARMEN
+
+
+async def barmen(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.text == 'Магазин':
+        await update.message.reply_text('В разработке')
+    elif update.message.text == 'Задание' and context.chat_data['player'].active_quest:
+        await update.message.reply_text(
+            'Раз ты дошел сюда - значит, уже чего-то стоишь. Но задание не из простых: в лесах завёлся Абракабр. '
+            'Злобная животина, скажу я тебе. И очень сильная. Чтобы с ней справиться - я дам тебе один флакончик: '
+            'восстановит тебе разом все здоровье. Смотри, не погибни там!')
+        await update.message.reply_text(f'❗ Получено задание! Очистить лес от Абракабра. Способ: вариативно\n'
+                                        f'P.S: информацию о заданиях вы можете узнать в профиле',
+                                        reply_markup=main_game_markup)
+        context.chat_data['player'].kvests += ['Очистить лес от Абракабра. Способ: вариативно']
+        context.chat_data['player'].active_quest -= 1
+        context.chat_data['player'].inventory['зелье здоровья'] = 1
+        return MAIN_GAME_MENU
+    elif update.message.text == 'Задание' and not context.chat_data['player'].active_quest:
+        await update.message.reply_text(f'Дел пока нет, зайди ко мне позже',
+                                        reply_markup=main_game_markup)
 
 
 def main() -> None:
@@ -384,10 +457,12 @@ def main() -> None:
     secret_handler = ConversationHandler(
         entry_points=[CommandHandler("secret", secret_start)],
         states={
-            SECRET_MAIN_MENU: [MessageHandler(filters.TEXT & ~filters.COMMAND, text_play)],
+            SECRET_START_MENU: [MessageHandler(filters.TEXT & ~filters.COMMAND, text_play)],
             REGISTER: [MessageHandler(filters.TEXT & ~filters.COMMAND, register)],
             GO_TO_FIRST_MONSTER: [MessageHandler(filters.TEXT & ~filters.COMMAND, go_to_first_monster)],
             FIGHT: [MessageHandler(filters.TEXT & ~filters.COMMAND, fight)],
+            MAIN_GAME_MENU: [MessageHandler(filters.TEXT & ~filters.COMMAND, game_main_menu)],
+            BARMEN: [MessageHandler(filters.TEXT & ~filters.COMMAND, barmen)]
         },
         fallbacks=[CommandHandler("qwdqdqwdqwdqwdwdqdwqdas", que_1)],  # тут написана дичь
         allow_reentry=True

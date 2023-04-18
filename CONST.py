@@ -1,5 +1,5 @@
-TOKEN = '6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8'  # токен бота
-
+# TOKEN = '6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8'  # токен бота
+TOKEN = '6214503286:AAF7uREMKI8Dx9AwcRhWnoxVnBlRNDB175o'
 
 bytic_address_1 = 'Сиреневый бульвар, 11, Троицк, Москва'  # адрес байтика на сиреневом
 bytic_address_2 = 'микрорайон В, 39, Троицк, Москва'  # адрес байтика на сиреневом
@@ -13,10 +13,12 @@ COURSES = 121  # для ф-ции курсов 1-4 классов
 ADDRESS = 'address'
 
 
-SECRET_MAIN_MENU = 'secret_1'
+SECRET_START_MENU = 'secret_1'
 REGISTER = 'register'
 GO_TO_FIRST_MONSTER = 'Go-go-go'
 FIGHT = 'fight'
+MAIN_GAME_MENU = 'main_game_menu'
+BARMEN = 'barmen'
 
 # расписание нахождения в Байтике для смен
 with open('ordinary.txt', 'r', encoding='utf-8') as ordinar:
