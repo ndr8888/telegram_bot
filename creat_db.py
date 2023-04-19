@@ -1,6 +1,6 @@
 import sqlite3
 
-# conn = sqlite3.connect('questions.db')
+# conn = sqlite3.connect('questions_and_courses.db')
 # cur = conn.cursor()
 # cur.execute("""CREATE TABLE IF NOT EXISTS questions(
 #    id INT ,
@@ -60,3 +60,57 @@ import sqlite3
 # - Свидетельство о рождении (родитель)\n
 # - Медицинский полис (родитель)');""")
 # conn.commit()
+
+
+conn = sqlite3.connect('db_data/questions_and_courses.db')
+cur = conn.cursor()
+cur.execute("""CREATE TABLE IF NOT EXISTS courses0(
+   id INT ,
+   name TEXT,
+   description TEXT,
+   link TEXT);
+""")
+cur.execute("""CREATE TABLE IF NOT EXISTS courses1(
+   id INT ,
+   name TEXT,
+   description TEXT,
+   link TEXT);
+""")
+cur.execute("""CREATE TABLE IF NOT EXISTS courses5(
+   id INT ,
+   name TEXT,
+   description TEXT,
+   link TEXT);
+""")
+conn.commit()
+
+['', '', ''],
+
+lst0 = [['МАМА И МАЛЫШ', 'Раскрытие врожденных способностей', 'https://bytic.ru/enrollment.html?course=1660'],
+        ['СОЗДАЙ СВОЙ МУЛЬТФИЛЬМ НА КОМПЬЮТЕРЕ',
+         'Начинать программировать можно уже детском саду, например, попробовать создать собственный мультфильм!',
+         'https://bytic.ru/enrollment.html?course=1655'],
+        ['РОБОТОТЕХНИКА LEGО ДЛЯ ДОШКОЛЬНИКОВ',
+         'На занятиях вместе с педагогом дети создадут своих роботов, познакомятся с работой моторов и датчиков. Освоят базовые принципы программирования и научатся создавать алгоритмы в графической среде WEDO.',
+         'https://bytic.ru/enrollment.html?course=1656'],
+        ['КЕРАМИКА И РОСПИСЬ',
+         'Ждем летом ребят с 5 лет и старше, а также взрослых на занятия в нашей творческой мастерской!',
+         'https://bytic.ru/enrollment.html?course=1643'],
+        ['КАЛЛИГРАФИЯ',
+         'Письмо – это навык, который требует умения сосредоточиться, координировать свои движения, точную работу мышц кисти руки.',
+         'https://bytic.ru/enrollment.html?course=1454'],
+        ]
+lst1 = [
+    ['РОБОТОТЕХНИКА LEGО. КОСМИЧЕСКИЕ ПРИКЛЮЧЕНИЯ', 'Можно ли обойтись без роботов в космосе? Какую работу они там выполняют? Что умеют современные роботы? Узнаем ответы на эти и другие вопросы на наших летних занятиях. Мы соберем космических роботов и научимся управлять ими.', 'https://bytic.ru/enrollment.html?course=1647'],
+]
+lst5 = [['ИНЖЕНЕРНЫЙ ДИЗАЙН', 'На занятиях мы будем читать чертежи и создадим по ним трехмерные детали. Сделаем компьютерную сборку деталей и напечатаем их на 3D-принтере.  Мы поработаем с измерительными инструментами. Проведем замеры и выполним обратное проектирование деталей.', 'https://bytic.ru/enrollment.html?course=1651'],]
+for i in range(len(lst0)):
+    cur.execute(f"""INSERT INTO courses0(id, name, description, link)
+       VALUES({i}, '{lst0[i][0]}', '{lst0[i][1]}', '{lst0[i][2]}');""")
+for i in range(len(lst1)):
+    cur.execute(f"""INSERT INTO courses1(id, name, description, link)
+       VALUES({i}, '{lst1[i][0]}', '{lst1[i][1]}', '{lst1[i][2]}');""")
+for i in range(len(lst5)):
+    cur.execute(f"""INSERT INTO courses5(id, name, description, link)
+       VALUES({i}, '{lst5[i][0]}', '{lst5[i][1]}', '{lst5[i][2]}');""")
+conn.commit()

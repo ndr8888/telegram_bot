@@ -113,10 +113,10 @@ class Ui_Form(object):
         self.pushButton_game.setText(_translate("Form", "игра"))
 
     def add(self):
-        db_session.global_init('db_data/questions.db')
+        db_session.global_init('db_data/questions_and_courses.db')
         db_sess = db_session.create_session()
         qa = Questions()
-        conn = sqlite3.connect('db_data/questions.db')
+        conn = sqlite3.connect('db_data/questions_and_courses.db')
         cur = conn.cursor()
         qid = cur.execute("SELECT * FROM questions").fetchall()[-1][0]
         conn.commit()
@@ -134,7 +134,7 @@ class Ui_Form(object):
         run_game()
 
     def delete(self):
-        conn = sqlite3.connect(r'db_data\questions.db')
+        conn = sqlite3.connect(r'db_data/questions_and_courses.db')
         cur = conn.cursor()
         cur.execute(f"DELETE FROM questions WHERE id = {self.spinBox.value()}")
         conn.commit()
@@ -142,7 +142,7 @@ class Ui_Form(object):
         self.questions_update()
 
     def questions_update(self):
-        conn = sqlite3.connect('db_data/questions.db')
+        conn = sqlite3.connect('db_data/questions_and_courses.db')
         cur = conn.cursor()
         res = cur.execute('SELECT * FROM questions').fetchall()
         t = ''

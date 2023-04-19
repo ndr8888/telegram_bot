@@ -26,7 +26,7 @@ if __version_info__ < (20, 0, 0, "alpha", 5):
         f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
 
-db_session.global_init('db_data/questions.db')  # инициализация бд
+db_session.global_init('db_data/questions_and_courses.db')  # инициализация бд
 
 from markups_and_ques import *  # после инициализации импортируем все markupы, не переносить наверх
 
@@ -57,6 +57,11 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE, back_mes
             "Выберите интересующее Вас направление",
             reply_markup=markup_1)
         return MENU_1
+    elif 'дошкольники' in [update.message.text, back_message]:
+        await update.message.reply_text(
+            "Выберите интересующее Вас направление",
+            reply_markup=markup_0)
+        return MENU_0
     elif '5-11 классы' in [update.message.text, back_message]:
         await update.message.reply_text(
             "Выберите интересующее Вас направление",
@@ -72,7 +77,7 @@ async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await update.message.reply_text('Выберите интересующий Вас вопрос', reply_markup=groups)
         return GROUPS_1
     elif update.message.text == 'Летние курсы':
-        await update.message.reply_text('Выберите интересующий Вас курс', reply_markup=markup_1_2)
+        await update.message.reply_text('Выберите интересующий Вас курс', reply_markup=markup_course_1)
         context.chat_data['courses'] = 1
         return MENU_1_2
     elif update.message.text == 'Назад':
@@ -138,18 +143,17 @@ async def menu_1_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def menu_1_2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    context.chat_data['course'] = update.message.text
-    if update.message.text == 'Каллиграфия':
-        await update.message.reply_text('Пожалуйста, выберите действие', reply_markup=markup_courses)
-        return COURSES
-    elif update.message.text == 'Курс1':
-        await update.message.reply_text('Пожалуйста, выберите действие', reply_markup=markup_courses)
-        return COURSES
-    elif update.message.text == 'Курс2':
+    print(123)
+    if update.message.text in list(courses0_dct.keys()) + list(courses1_dct.keys()) + list(courses5_dct.keys()):
+        context.chat_data['course'] = update.message.text
         await update.message.reply_text('Пожалуйста, выберите действие', reply_markup=markup_courses)
         return COURSES
     elif update.message.text == 'Назад':
-        if context.chat_data['courses'] == 1:
+        if context.chat_data['courses'] == 0:
+            await update.message.reply_text(
+                'Вы вернулись в предыдущий раздел', reply_markup=markup_0)
+            return MENU_0
+        elif context.chat_data['courses'] == 1:
             await update.message.reply_text(
                 'Вы вернулись в предыдущий раздел', reply_markup=markup_1)
             return MENU_1
@@ -163,20 +167,40 @@ async def menu_1_2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def courses(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    print(1)
     if update.message.text == 'Описание':
-        if context.chat_data['course'] == 'Каллиграфия':
-            await update.message.reply_text('Тут будет информация о курсе Каллиграфии')
-        elif context.chat_data['course'] == 'Курс1':
-            await update.message.reply_text('Тут будет информация о курсе1')
-        elif context.chat_data['course'] == 'Курс2':
-            await update.message.reply_text('Тут будет информация о курсе2')
+        if context.chat_data['courses'] == 0:
+            await update.message.reply_text(courses0_dct[context.chat_data['course']][0])
+        elif context.chat_data['courses'] == 1:
+            await update.message.reply_text(courses1_dct[context.chat_data['course']][0])
+        else:
+            await update.message.reply_text(courses5_dct[context.chat_data['course']][0])
+        # if context.chat_data['course'] == 'Каллиграфия':
+        #     await update.message.reply_text('Тут будет информация о курсе Каллиграфии')
+        # elif context.chat_data['course'] == 'Курс1':
+        #     await update.message.reply_text('Тут будет информация о курсе1')
+        # elif context.chat_data['course'] == 'Курс2':
+        #     await update.message.reply_text('Тут будет информация о курсе2')
     elif update.message.text == 'Записаться на курс':
-        await update.message.reply_text(
-            'Записаться на курс можно будет по ссылке: *тут будет ссылка*')
+        if context.chat_data['courses'] == 0:
+            await update.message.reply_text(courses0_dct[context.chat_data['course']][1])
+        elif context.chat_data['courses'] == 1:
+            await update.message.reply_text(courses1_dct[context.chat_data['course']][1])
+        else:
+            await update.message.reply_text(courses5_dct[context.chat_data['course']][1])
     elif update.message.text == 'Назад':
-        await update.message.reply_text(
-            'Вы вернулись в предыдущий раздел', reply_markup=markup_1_2)
-        return MENU_1_2
+        if context.chat_data['courses'] == 0:
+            await update.message.reply_text(
+                'Вы вернулись в предыдущий раздел', reply_markup=markup_course_0)
+            return MENU_1_2
+        elif context.chat_data['courses'] == 1:
+            await update.message.reply_text(
+                'Вы вернулись в предыдущий раздел', reply_markup=markup_course_1)
+            return MENU_1_2
+        else:
+            await update.message.reply_text(
+                'Вы вернулись в предыдущий раздел', reply_markup=markup_course_5)
+            return MENU_1_2
     else:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующее Вас действие")
@@ -248,13 +272,12 @@ async def menu_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             reply_markup=markup_address)
         return ADDRESS
     elif update.message.text == 'Летние курсы':
-        await update.message.reply_text('Выберите интересующий Вас курс', reply_markup=markup_1_2)
+        await update.message.reply_text('Выберите интересующий Вас курс', reply_markup=markup_course_5)
         context.chat_data['courses'] = 5
         return MENU_1_2
     else:
         await update.message.reply_text(
             "Я Вас не понимаю☹ Пожалуйста, выберите интересующий Вас вопрос")
-
 
 async def que_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     for que, ans in que_dct_1.items():
@@ -275,6 +298,17 @@ async def que_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
                 reply_markup=markup_q_5)
     if update.message.text == 'Назад':
         return await main_menu(update, context, back_message='5-11 классы')
+
+async def menu_0(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if update.message.text == 'Летние курсы':
+        await update.message.reply_text('Выберите интересующий Вас курс', reply_markup=markup_course_0)
+        context.chat_data['courses'] = 0
+        return MENU_1_2
+    elif update.message.text == 'Назад':
+        return await start(update, context, back=True)
+    else:
+        await update.message.reply_text(
+            "Я Вас не понимаю☹ Пожалуйста, выберите интересующий Вас вопрос")
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -309,7 +343,9 @@ def main() -> None:
             # летние программы 5-11
             QUE_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, que_1)],  # вопросы 1-4
             QUE_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, que_5)],  # вопросы 5-11
-            ADDRESS: [MessageHandler(filters.TEXT & ~filters.COMMAND, address_menu)]
+            ADDRESS: [MessageHandler(filters.TEXT & ~filters.COMMAND, address_menu)],
+            MENU_0: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_0)],
+
         },
         fallbacks=[CommandHandler("cancel", cancel)],
         allow_reentry=True
