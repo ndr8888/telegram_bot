@@ -1,3 +1,6 @@
+# TOKEN = '6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8'  # токен бота
+TOKEN = '5846392119:AAHq6hs73GVd6UOPw6rQksc18y2QhRK2_Qw'
+
 bytic_address_1 = 'Сиреневый бульвар, 11, Троицк, Москва'  # адрес байтика на сиреневом
 bytic_address_2 = 'микрорайон В, 39, Троицк, Москва'  # адрес байтика на сиреневом
 geocoder_uri = "http://geocode-maps.yandex.ru/1.x/"  # для запроса статик апи
@@ -8,8 +11,6 @@ MENU_1_1, MENU_1_2 = 11, 12  # для вызова ф-ций menu_1_1 и menu_1_
 GROUPS_1 = 'groups_1_4'  # для вызова ф-ции groups_1
 COURSES = 121  # для ф-ции курсов 1-4 классов
 ADDRESS = 'address'
-
-TOKEN = '6013111011:AAF8HwDbWB22mjumWf5i3spHsslf3tnjFh8'  # токен бота
 
 
 # расписание нахождения в Байтике для смен

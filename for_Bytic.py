@@ -1,8 +1,11 @@
 from db_data import db_session
 from logger import *
 from CONST import *
-
 from geocode import api_request
+
+from Player import *
+from Monsters import *
+
 from telegram import __version__ as TG_VER
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import (
@@ -79,17 +82,19 @@ async def menu_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         return await start(update, context, back=True)
     else:
         await update.message.reply_text(
-            "Я Вас не понимаю☹ Пожалуйста, выберите интересующее Вас направление")
+            "Я Вас не понимаю☹ Пожалуйста, выберите что-нибудь из предложенного списка")
 
 
 async def groups_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     # сохраняю информацию в словарь, чтобы на основе выбранной группы выводить описание
     context.chat_data['groups'] = update.message.text
     if update.message.text == '1-я смена (29 мая - 9 июня)':
-        await update.message.reply_text('Выберите интересующую Вас информацию', reply_markup=markup_1_1)
+        await update.message.reply_text('Выберите интересующую Вас информацию',
+                                        reply_markup=markup_1_1)
         return MENU_1_1
     elif update.message.text == '2-я смена (13 июня - 23 июня)':
-        await update.message.reply_text('Выберите интересующую Вас информацию', reply_markup=markup_1_1)
+        await update.message.reply_text('Выберите интересующую Вас информацию',
+                                        reply_markup=markup_1_1)
         return MENU_1_1
     else:
         await update.message.reply_text(
@@ -165,7 +170,8 @@ async def courses(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         elif context.chat_data['course'] == 'Курс2':
             await update.message.reply_text('Тут будет информация о курсе2')
     elif update.message.text == 'Записаться на курс':
-        await update.message.reply_text('Записаться на курс можно будет по ссылке: *тут будет ссылка*')
+        await update.message.reply_text(
+            'Записаться на курс можно будет по ссылке: *тут будет ссылка*')
     elif update.message.text == 'Назад':
         await update.message.reply_text(
             'Вы вернулись в предыдущий раздел', reply_markup=markup_1_2)
@@ -291,12 +297,15 @@ def main() -> None:
         entry_points=[CommandHandler("start", start)],
         states={
             MAIN_MENU: [MessageHandler(filters.TEXT & ~filters.COMMAND, main_menu)],  # главное меню
-            MENU_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_1)],  # выбор для 1-4 класса
+            MENU_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_1)],
+            # выбор для 1-4 класса
             GROUPS_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, groups_1)],  # выбор смены
-            MENU_1_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_1_1)],  # летние программы
+            MENU_1_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_1_1)],
+            # летние программы
             MENU_1_2: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_1_2)],  # летние курсы
             COURSES: [MessageHandler(filters.TEXT & ~filters.COMMAND, courses)],
-            MENU_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_5)],  # летние программы 5-11
+            MENU_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, menu_5)],
+            # летние программы 5-11
             QUE_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, que_1)],  # вопросы 1-4
             QUE_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, que_5)],  # вопросы 5-11
             ADDRESS: [MessageHandler(filters.TEXT & ~filters.COMMAND, address_menu)]
