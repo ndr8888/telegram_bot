@@ -16,9 +16,11 @@ ADDRESS = 'address'
 SECRET_START_MENU = 'secret_1'
 REGISTER = 'register'
 GO_TO_FIRST_MONSTER = 'Go-go-go'
-FIGHT = 'fight'
+FIRST_FIGHT = 'first_fight'
 MAIN_GAME_MENU = 'main_game_menu'
 BARMEN = 'barmen'
+ASSORTMENT = 'assort'
+USUAL_FIGHT = 'fight'
 
 # расписание нахождения в Байтике для смен
 with open('ordinary.txt', 'r', encoding='utf-8') as ordinar:

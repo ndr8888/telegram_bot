@@ -277,10 +277,8 @@ async def que_5(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user = update.message.from_user
-    logger.info("User %s canceled the conversation.", user.first_name)
     await update.message.reply_text(
-        "Bye! I hope we can talk again some day.", reply_markup=ReplyKeyboardRemove()
+        "Информация сброшена", reply_markup=ReplyKeyboardRemove()
     )
 
     return ConversationHandler.END
@@ -289,7 +287,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def secret_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f'Приветствую, {update.message.chat.last_name} {update.message.chat.first_name}. '
-        f'Ты знаешь тайный пароль! Тебе доступен уникальный набор функций! Так используй же их!',
+        f'Ты знаешь тайный пароль! Тебе доступен уникальный набор функций! Так используй же их!\nP.S если Вы уже использовали команду /start, для продолжения напишите /cancel, а потом снова /secret',
         reply_markup=secret_markup_1)
     return SECRET_START_MENU
 
@@ -333,12 +331,12 @@ async def go_to_first_monster(update: Update, context: ContextTypes.DEFAULT_TYPE
         context.chat_data['last_message'] = update.message.text
         await update.message.reply_text('Желаю тебе удачи, будет сложно, но ты - ты справишься!!!')
         await update.message.reply_text('Перед тобой небольшой монстрик. Бой начался!', reply_markup=markup_for_fight)
-        return FIGHT
+        return FIRST_FIGHT
     else:
         await update.message.reply_text('Не время для разговоров! Пора идти!')
 
 
-async def fight(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def first_fight(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.chat_data['last_message'] == 'Вперёд!':
         context.chat_data['enemy'] = Monster('weak')
         context.chat_data['spawn'] = 0
@@ -354,7 +352,7 @@ async def fight(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if context.chat_data['enemy'].hp > 0:
                 await update.message.reply_text(
                     f"Противник нанёс Вам {context.chat_data['enemy'].damage} урона. У Вас осталось {context.chat_data['player'].hp} хп")
-        else:
+        elif update.message.text == 'Бежать':
             regen = randint(1, 2)
             if context.chat_data['player'].hp != context.chat_data['player'].max_hp:
                 if context.chat_data['player'].hp + regen > context.chat_data['player'].max_hp:
@@ -385,12 +383,16 @@ async def fight(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def game_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.text == 'Продолжить':
+    if update.message.text == 'Идём на базу!':
         await update.message.reply_text(
             f'Поздравляю тебя, {context.chat_data["player"].nick}, ты прошел курс молодого охотника и теперь готов ко всему. Дальше ты будешь действовать сам, и, кто знает, возможно, тебя однажды возьмут к нам в Гильдию?',
             reply_markup=main_game_markup)
         context.chat_data['last_message'] = ''
-    if update.message.text == 'Инвентарь':
+    elif update.message.text == 'Вернуться на базу':
+        await update.message.reply_text(
+            f'Ты на базе',
+            reply_markup=main_game_markup)
+    elif update.message.text == 'Инвентарь':
         await update.message.reply_text(
             f'Ваш инвентарь: {", ".join([" - ".join([key, str(context.chat_data["player"].inventory[key])]) for key in context.chat_data["player"].inventory.keys()])}')
     elif update.message.text == 'Профиль':
@@ -404,11 +406,25 @@ async def game_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f'Владелец: — Привет, {context.chat_data["player"].nick}. Дело ищешь или желаешь посмотреть на товар?',
             reply_markup=barmen_markup)
         return BARMEN
+    elif update.message.text == 'Отправиться на охоту' or update.message.text == 'Продолжить охоту':
+        int_monster = randint(1, 100)
+        if int_monster > 70:
+            await update.message.reply_text(
+                'Вам повезло (или нет) и вы наконец встретили Абракабра! Тут Вам помогут лишь Ваша удача и сноровка. Убежать нельзя, бой!',
+                reply_markup=markup_for_top_fight)
+            context.chat_data['enemy'] = Monster('Abrakabr')
+            return USUAL_FIGHT
+        elif int_monster < 70:
+            await update.message.reply_text('Вы снова встретили монстрика', reply_markup=markup_for_fight)
+            context.chat_data['enemy'] = Monster('weak')
+            return USUAL_FIGHT
 
 
 async def barmen(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.text == 'Магазин':
-        await update.message.reply_text('В разработке')
+        await update.message.reply_text(f'Выбирай, вот список товара:\n{"".join([i for i in assortment])}',
+                                        reply_markup=assortment_markup)
+        return ASSORTMENT
     elif update.message.text == 'Задание' and context.chat_data['player'].active_quest:
         await update.message.reply_text(
             'Раз ты дошел сюда - значит, уже чего-то стоишь. Но задание не из простых: в лесах завёлся Абракабр. '
@@ -419,11 +435,116 @@ async def barmen(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                         reply_markup=main_game_markup)
         context.chat_data['player'].kvests += ['Очистить лес от Абракабра. Способ: вариативно']
         context.chat_data['player'].active_quest -= 1
-        context.chat_data['player'].inventory['зелье здоровья'] = 1
+        context.chat_data['player'].inventory['зелье исцеления'] = 1
         return MAIN_GAME_MENU
-    elif update.message.text == 'Задание' and not context.chat_data['player'].active_quest:
+    elif update.message.text == 'Задание' and context.chat_data['player'].active_quest == 0:
         await update.message.reply_text(f'Дел пока нет, зайди ко мне позже',
                                         reply_markup=main_game_markup)
+        return MAIN_GAME_MENU
+
+
+async def assortiment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.text == 'Назад':
+        await update.message.reply_text('Вы вернулись в главное меню', reply_markup=main_game_markup)
+        return MAIN_GAME_MENU
+    elif update.message.text in [i.split(' - ')[0] for i in assortment]:
+        cost = int(
+            "".join([i.split(' - ')[1].split()[0] for i in assortment if i.split(' - ')[0] == update.message.text]))
+        if context.chat_data['player'].inventory['золотые монеты'] >= cost:
+            context.chat_data['player'].inventory['золотые монеты'] -= cost
+            text_cost = golden.make_agree_with_number(cost).word + ' ' + coin.make_agree_with_number(cost).word
+            golden_coins = golden.make_agree_with_number(
+                context.chat_data["player"].inventory["золотые монеты"]).word + ' ' + coin.make_agree_with_number(
+                context.chat_data["player"].inventory["золотые монеты"]).word
+            # с помощью библиотеки pymorphy2 слова пишутся правильно в соответствии с количеством монет
+            await update.message.reply_text(
+                f'С вашего счёта списана сумма в размере {cost} {text_cost}\nУ вас осталось '
+                f'{context.chat_data["player"].inventory["золотые монеты"]} {golden_coins}')
+            if 'Лишние оружия' in context.chat_data['player'].inventory.keys():
+                if context.chat_data['player'].weapon != 'Кулак':
+                    context.chat_data['player'].inventory['Лишние оружия'] += [context.chat_data['player'].weapon]
+            else:
+                if context.chat_data['player'].weapon != 'Кулак':
+                    context.chat_data['player'].inventory['Лишние оружия'] = [context.chat_data['player'].weapon]
+            context.chat_data['player'].weapon = "".join(
+                [i.split(' - ')[0] for i in assortment if i.split(' - ')[0] == update.message.text])
+            with open('weapons_damage.txt', 'r', encoding='utf-8') as dam:
+                context.chat_data['player'].damage = int(
+                    "".join([i.split(' - ')[1] for i in dam.readlines() if
+                             i.split(' - ')[0] == context.chat_data['player'].weapon])) + context.chat_data[
+                                                         'player'].force
+        else:
+            golden_coins = golden.make_agree_with_number(
+                context.chat_data["player"].inventory["золотые монеты"]).word + ' ' + coin.make_agree_with_number(
+                context.chat_data["player"].inventory["золотые монеты"]).word
+            await update.message.reply_text(
+                f'Не хватает денег, на вашем счету {context.chat_data["player"].inventory["золотые монеты"]} {golden_coins}')
+
+
+async def usual_fight(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if context.chat_data['player'].hp > 0 and context.chat_data['enemy'].hp > 0:
+        if update.message.text == 'Атаковать':
+            context.chat_data['enemy'].hp -= context.chat_data['player'].damage
+            context.chat_data['player'].hp -= context.chat_data['enemy'].damage
+            if context.chat_data['enemy'].hp < 0:
+                context.chat_data['enemy'].hp = 0
+            if context.chat_data['player'].hp < 0:
+                context.chat_data['player'].hp = 0
+            await update.message.reply_text(
+                f"Вы нанесли противнику {context.chat_data['player'].damage} урона. У него осталось {context.chat_data['enemy'].hp} хп")
+            if context.chat_data['enemy'].hp > 0:
+                await update.message.reply_text(
+                    f"Абракабр нанёс Вам {context.chat_data['enemy'].damage} урона. У Вас осталось {context.chat_data['player'].hp} хп")
+        elif update.message.text == 'Зелье исцеления' and context.chat_data['enemy'].name == 'abrakabr':
+            if context.chat_data['player'].inventory['зелье исцеления'] > 0:
+                context.chat_data['player'].hp = context.chat_data['player'].max_hp
+                context.chat_data['player'].inventory['зелье исцеления'] -= 1
+                await update.message.reply_text(
+                    f'Вы восстановили полное здоровье. Теперь у вас его {context.chat_data["player"].max_hp}')
+        elif update.message.text == 'Бежать':
+            if context.chat_data['enemy'].name == 'abrakabr':
+                await update.message.reply_text('От Абракабра не убежать! Сражайся!!!')
+            elif context.chat_data['enemy'].name == 'weak':
+                regen = randint(1, 2)
+                if context.chat_data['player'].hp != context.chat_data['player'].max_hp:
+                    if context.chat_data['player'].hp + regen > context.chat_data['player'].max_hp:
+                        context.chat_data['player'].hp = context.chat_data['player'].max_hp
+                    else:
+                        context.chat_data['player'].hp += regen
+                    await update.message.reply_text(
+                        f"Вы восстанавливаете {regen} здоровья и теперь его у вас {context.chat_data['player'].hp}, но монстр догоняет!!!")
+                else:
+                    await update.message.reply_text(
+                        f"У вас максимальное количество здоровья, но монстр уже близко!")
+            else:
+                await update.message.reply_text('У вас нет зелий исцеления :(')
+
+    if context.chat_data['enemy'].hp == 0 and context.chat_data['enemy'].name != 'abrakabr':
+        await update.message.reply_text(
+            f'Это было невероятно трудно, но ты справился! Вы получили: {", ".join([" - ".join([key, str(context.chat_data["enemy"].drop[key])]) for key in context.chat_data["enemy"].drop.keys()])}',
+            reply_markup=hunting_markup)
+        for loot in context.chat_data['enemy'].drop.keys():
+            context.chat_data['player'].inventory[loot] += context.chat_data['enemy'].drop[loot]
+        context.chat_data.pop('enemy', None)
+        return MAIN_GAME_MENU
+    elif context.chat_data['enemy'].hp == 0 and context.chat_data['enemy'].name == 'abrakabr':
+        await update.message.reply_text(
+            f'Ты победил настоящее чудовище! Ты - ГЕРОЙ!!!\n✔️ Задание "Очистить лес от Абракабра" завершено\n'
+            f'Вы получили: {", ".join([" - ".join([key, str(context.chat_data["enemy"].drop[key])]) for key in context.chat_data["enemy"].drop.keys()])}',
+            reply_markup=main_game_markup)
+        for index, kvest in enumerate(context.chat_data['player'].kvests):
+            if 'Абракабр' in kvest:
+                del context.chat_data['player'].kvests[index]
+        for loot in context.chat_data['enemy'].drop.keys():
+            context.chat_data['player'].inventory[loot] += context.chat_data['enemy'].drop[loot]
+        context.chat_data.pop('enemy', None)
+        return MAIN_GAME_MENU
+    elif context.chat_data['player'].hp == 0:
+        await update.message.reply_text(
+            'Ты погиб, но не навсегда. У тебя ещё будет возможность взять реванш\nВаше здоровье восстановлено', reply_markup=main_game_markup)
+        context.chat_data['player'].hp = context.chat_data['player'].max_hp
+        return MAIN_GAME_MENU
+    context.chat_data['last_message'] = update.message.text
 
 
 def main() -> None:
@@ -460,9 +581,11 @@ def main() -> None:
             SECRET_START_MENU: [MessageHandler(filters.TEXT & ~filters.COMMAND, text_play)],
             REGISTER: [MessageHandler(filters.TEXT & ~filters.COMMAND, register)],
             GO_TO_FIRST_MONSTER: [MessageHandler(filters.TEXT & ~filters.COMMAND, go_to_first_monster)],
-            FIGHT: [MessageHandler(filters.TEXT & ~filters.COMMAND, fight)],
+            FIRST_FIGHT: [MessageHandler(filters.TEXT & ~filters.COMMAND, first_fight)],
             MAIN_GAME_MENU: [MessageHandler(filters.TEXT & ~filters.COMMAND, game_main_menu)],
-            BARMEN: [MessageHandler(filters.TEXT & ~filters.COMMAND, barmen)]
+            BARMEN: [MessageHandler(filters.TEXT & ~filters.COMMAND, barmen)],
+            ASSORTMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, assortiment)],
+            USUAL_FIGHT: [MessageHandler(filters.TEXT & ~filters.COMMAND, usual_fight)]
         },
         fallbacks=[CommandHandler("qwdqdqwdqwdqwdwdqdwqdas", que_1)],  # тут написана дичь
         allow_reentry=True
