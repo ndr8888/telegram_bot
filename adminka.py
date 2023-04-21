@@ -1,7 +1,10 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+import sqlite3
+
+from PyQt5 import QtCore, QtWidgets
+
 from db_data import db_session
 from db_data.questions import Questions
-import sqlite3
+from game.game import run_game
 
 
 class Ui_Form(object):
@@ -68,12 +71,24 @@ class Ui_Form(object):
         self.label_8.setGeometry(QtCore.QRect(430, 150, 601, 21))
         self.label_8.setObjectName("label_8")
 
+        self.pushButton_game = QtWidgets.QPushButton(Form)
+        self.pushButton_game.setGeometry(QtCore.QRect(0, 25, 200, 51))
+        self.pushButton_game.setStyleSheet("background-color: rgba(210, 220, 210, 150);\n"
+                                           "border: 1px solid rgba(210, 220, 210, 180);\n"
+                                           "border-radius: 10px;\n"
+                                           "color: black;\n"
+                                           "font-weight: bold;\n"
+                                           "font-size: 16px;\n"
+                                           "")
+        self.pushButton_game.setObjectName("pushButton_game")
+
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
         self.questions_update()
 
         self.pushButton.clicked.connect(self.add)
         self.pushButton_2.clicked.connect(self.delete)
+        self.pushButton_game.clicked.connect(self.start_game)
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
@@ -95,11 +110,13 @@ class Ui_Form(object):
         self.label_8.setText(_translate("Form",
                                         "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; font-weight:600;\">Содержимое базы данных:</span></p></body></html>"))
 
+        self.pushButton_game.setText(_translate("Form", "игра"))
+
     def add(self):
-        db_session.global_init('db_data/questions.db')
+        db_session.global_init('db_data\questions_and_courses.db')
         db_sess = db_session.create_session()
         qa = Questions()
-        conn = sqlite3.connect('db_data/questions.db')
+        conn = sqlite3.connect('db_data\questions_and_courses.db')
         cur = conn.cursor()
         qid = cur.execute("SELECT * FROM questions").fetchall()[-1][0]
         conn.commit()
@@ -113,8 +130,11 @@ class Ui_Form(object):
         self.textEdit_2.setText('')
         self.questions_update()
 
+    def start_game(self):
+        run_game()
+
     def delete(self):
-        conn = sqlite3.connect(r'db_data\questions.db')
+        conn = sqlite3.connect(r'db_data\questions_and_courses.db')
         cur = conn.cursor()
         cur.execute(f"DELETE FROM questions WHERE id = {self.spinBox.value()}")
         conn.commit()
@@ -122,7 +142,7 @@ class Ui_Form(object):
         self.questions_update()
 
     def questions_update(self):
-        conn = sqlite3.connect('db_data/questions.db')
+        conn = sqlite3.connect('db_data/questions_and_courses.db')
         cur = conn.cursor()
         res = cur.execute('SELECT * FROM questions').fetchall()
         t = ''
@@ -133,6 +153,7 @@ class Ui_Form(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Form = QtWidgets.QWidget()
     ui = Ui_Form()
