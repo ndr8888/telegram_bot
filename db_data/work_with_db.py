@@ -1,14 +1,32 @@
 from . import db_session
 from db_data.questions import Questions
+from db_data.courses_0 import Courses0
+from db_data.courses_1 import Courses1
+from db_data.courses_5 import Courses5
 
 
-def get_questions(): # получить словарь вопросов и ответов
+def get_questions():  # получить словарь вопросов и ответов
     db_sess = db_session.create_session()
     return dict(map(lambda x: (x.quest, x.ans), db_sess.query(Questions).all()))
 
+
+def get_courses_0():  # получить словарь вопросов и ответов
+    db_sess = db_session.create_session()
+    return dict(map(lambda x: (x.name, (x.description, x.link)), db_sess.query(Courses0).all()))
+
+
+def get_courses_1():  # получить словарь вопросов и ответов
+    db_sess = db_session.create_session()
+    return dict(map(lambda x: (x.name, (x.description, x.link)), db_sess.query(Courses1).all()))
+
+
+def get_courses_5():  # получить словарь вопросов и ответов
+    db_sess = db_session.create_session()
+    return dict(map(lambda x: (x.name, (x.description, x.link)), db_sess.query(Courses5).all()))
+
 # import sqlite3
 
-# conn = sqlite3.connect('questions.db')
+# conn = sqlite3.connect('questions_and_courses.db')
 # cur = conn.cursor()
 # que_dct_1 = que_dct_5 = dict([tuple(list(cur.execute(f"""SELECT * FROM questions WHERE id={i}"""))[0][1:]) for i in range(1, 16)])
 

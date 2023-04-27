@@ -8,7 +8,7 @@ from flask_login import UserMixin
 from sqlalchemy_serializer import SerializerMixin
 
 
-class Questions(SqlAlchemyBase, SerializerMixin): # таблица с вопросами-ответами
+class Questions(SqlAlchemyBase, SerializerMixin):  # таблица с вопросами-ответами
     __tablename__ = 'questions'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,

@@ -60,3 +60,83 @@ import sqlite3
 # - Свидетельство о рождении (родитель)\n
 # - Медицинский полис (родитель)');""")
 # conn.commit()
+
+
+conn = sqlite3.connect('db_data/questions_and_courses.db')
+cur = conn.cursor()
+cur.execute("""CREATE TABLE IF NOT EXISTS courses0(
+   id INT ,
+   name TEXT,
+   description TEXT,
+   link TEXT);
+""")
+cur.execute("""CREATE TABLE IF NOT EXISTS courses1(
+   id INT ,
+   name TEXT,
+   description TEXT,
+   link TEXT);
+""")
+cur.execute("""CREATE TABLE IF NOT EXISTS courses5(
+   id INT ,
+   name TEXT,
+   description TEXT,
+   link TEXT);
+""")
+conn.commit()
+
+
+with open('mama_and_malish.txt', 'r', encoding='utf-8') as f:
+    text_mama_and_malish = f.read()
+
+lst0 = [['МАМА И МАЛЫШ', f'{text_mama_and_malish}', 'https://bytic.ru/courses/leto-2023/mama-i-malyish-leto.html'],
+        ['СОЗДАЙ СВОЙ МУЛЬТФИЛЬМ НА КОМПЬЮТЕРЕ',
+         'На занятиях ваш ребенок узнает, что такое алгоритм, спрайт, цикл, научится создавать программы, рисовать в графическом редакторе, записывать звук - все это поможет ему сделать первые шаги в мультипликации.',
+         'https://bytic.ru/courses/leto-2023/sozdaj-svoj-multfilm-na-kompyutere.html'],
+        ['РОБОТОТЕХНИКА LEGО ДЛЯ ДОШКОЛЬНИКОВ',
+         'На занятиях вместе с педагогом дети создадут своих роботов, познакомятся с работой моторов и датчиков. Освоят базовые принципы программирования и научатся создавать алгоритмы в графической среде WEDO.',
+         'https://bytic.ru/courses/leto-2023/robototexnika-lego-dlya-doshkolnikov.html'],
+        ['КЕРАМИКА И РОСПИСЬ',
+         'На каждом занятии будем работать с глиной и создавать неповторимые изделия (игрушки, посуду, статуэтки и многое другое), изучим различные техники лепки и росписи керамических изделий.\nВсе работы будут обожжены в профессиональной муфельной печи.\nЛепка из глины — это увлекательный процесс, который развивает моторику рук, успокаивает нервную систему и помогает развитию воображения.',
+         'https://bytic.ru/courses/leto-2023/keramika-i-rospis.html'],
+        ['КАЛЛИГРАФИЯ',
+         'Письмо – это навык, который требует умения сосредоточиться, координировать свои движения, точную работу мышц кисти руки.',
+         'https://bytic.ru/courses/leto-2023/kalligrafiya-leto.html'],
+        ['ЭКСПРЕСС-ПОДГОТОВКА К ШКОЛЕ', 'Наша цель: максимально эффективно подготовить ребенка к школе. Занимаясь с педагогом в малой группе (до 6 человек), ребенок учится правильно развивать ход своих мыслей.', 'https://bytic.ru/courses/leto-2023/ekspress-podgotovka-k-shkole.html'],
+        ['РАЗГОВАРИВАЮ ПРАВИЛЬНО', 'На занятиях мы будем отрабатывать навыки осмысленного чтения, а с помощью составления рассказов по сюжетным картинкам развивать логику и наблюдательность.', 'https://bytic.ru/courses/leto-2023/razgovarivayu-pravilno.html'],
+        ['РИСОВАНИЕ ПЕСКОМ', 'Песочное рисование – это рисование картин движениями рук на специальном стеклянном столе при помощи света и тени. Это не только современный вид творчества, но и эффективный метод, помогающий развить внутренний мир ребенка', 'https://bytic.ru/courses/doshkolnoe-otdelenie/risovanie-peskom.html'],
+        ]
+
+with open('KODY_GAME_LAB.txt', 'r', encoding='utf-8') as f:
+    kody = f.read()
+
+lst1 = [['ГЕЙМ ДИЗАЙН В ROBLOX STUDIO', 'На летних каникулах приглашаем ребят погрузиться в увлекательный мир разработки игр и сделать первый шаг к освоению востребованной профессии!\nОсвоим базовые инструменты для разработки игр в ROBLOX Studio и узнаем основы языка программирования Lua.', 'https://bytic.ru/courses/leto-2023/gejm-dizajn-v-roblox-studio.html'],
+    ['COSPACES И ROBLOX STUDIO', 'На летних каникулах приглашаем ребят погрузиться в мир виртуальной реальности, создать свои собственные 3D-миры, а также поработать в ROBLOX Studio и изучить основы языка программирования Lua.', 'https://bytic.ru/courses/leto-2023/cospaces-i-roblox-studiokopiya-scratch,-lego-wedo-2.0.html'],
+    ['SCRATCH + LEGO WEDO 2.0 (ПРОГРАММИРОВАНИЕ + РОБОТОТЕХНИКА)', 'Мы будем программировать в Scratch, это блочный визуальный язык программирования, похожий на конструктор LEGO, а также собирать роботов из настоящих кубиков и программировать их.', 'https://bytic.ru/courses/leto-2023/scratch,-lego-wedo-2.0.html'],
+    ['BRAWL STARS, ROBLOX, MINECRAFT', 'Мы окунемся в мир создания игр, программирования и 3D-моделирования. Мы построим свой трехмерный мир, запрограммируем игру c героем Minecraft и создадим 3D-героя.', 'https://bytic.ru/courses/leto-2023/brawl-stars,-roblox,-minecraft.html'],
+    ['KODU GAME LAB, COSPACES EDU, LEGO WEDO 2.0', f'{kody}', 'https://bytic.ru/courses/leto-2023/kopiya-czifrovoj-xudozhnik.html'],
+    ['РИСОВАНИЕ ПЕСКОМ', 'Песочное рисование – это рисование картин движениями рук на специальном стеклянном столе при помощи света и тени. Это не только современный вид творчества, но и эффективный метод, помогающий развить внутренний мир ребенка', 'https://bytic.ru/courses/doshkolnoe-otdelenie/risovanie-peskom.html'],
+    ['РОБОТОТЕХНИКА LEGО. КОСМИЧЕСКИЕ ПРИКЛЮЧЕНИЯ', 'Можно ли обойтись без роботов в космосе? Какую работу они там выполняют? Что умеют современные роботы? Узнаем ответы на эти и другие вопросы на наших летних занятиях. Мы соберем космических роботов и научимся управлять ими.', 'https://bytic.ru/courses/leto-2023/robototexnika-lego-dlya-doshkolnikov.html'],
+]
+
+with open('Russian_language.txt', 'r', encoding='utf-8') as f:
+    Rus = f.read()
+with open('Math.txt', 'r', encoding='utf-8') as f:
+    math = f.read()
+
+lst5 = [['МАТЕМАТИКА', f'{math}', 'https://bytic.ru/courses/leto-2023/kopiya-matematika.html'],
+    ['РУССКИЙ ЯЗЫК', f'{Rus}', 'https://bytic.ru/courses/leto-2023/russkij-yazyik.html'],
+    ['ОСНОВЫ 3D ГРАФИКИ В ПРОГРАММЕ BLENDER', 'Профессиональные 3D-художники используют Blender для создания компьютерной графики. Программа позволяет моделировать интерьеры и персонажей, настраивать освещение, симулировать физику и частицы. С помощью инструментов Blender можно создать масштабные сцены для виртуальной реальности, фильмов и игр.\nНа занятиях вы создадите 3D-модель, узнаете основы скульптинга, будете настраивать освещение, поработаете с текстурами и материалами.', 'https://bytic.ru/courses/leto-2023/osnovyi-3d-grafiki-v-programme-blender.html'],
+    ['ЦИФРОВОЙ ХУДОЖНИК', 'Курс подойдет тем ребятам, кто очень хочет попробовать свои силы в цифровом дизайне, по пока не знает, с чего начать.\nОсвоив ключевые инструменты профессиональной программы Adobe Illustrator, вы создадите свои первые digital art шедевры!', 'https://bytic.ru/courses/leto-2023/czifrovoj-xudozhnik.html'],
+    ['ГЕЙМ ДИЗАЙН В ROBLOX STUDIO', 'На летних каникулах приглашаем ребят погрузиться в увлекательный мир разработки игр и сделать первый шаг к освоению востребованной профессии!\nОсвоим базовые инструменты для разработки игр в ROBLOX Studio и узнаем основы языка программирования Lua.', 'https://bytic.ru/courses/leto-2023/gejm-dizajn-v-roblox-studio.html'],
+    ['COSPACES И ROBLOX STUDIO', 'На летних каникулах приглашаем ребят погрузиться в мир виртуальной реальности, создать свои собственные 3D-миры, а также поработать в ROBLOX Studio и изучить основы языка программирования Lua.', 'https://bytic.ru/courses/leto-2023/cospaces-i-roblox-studiokopiya-scratch,-lego-wedo-2.0.html'],
+        ['ИНЖЕНЕРНЫЙ ДИЗАЙН', 'На занятиях мы будем читать чертежи и создадим по ним трехмерные детали. Сделаем компьютерную сборку деталей и напечатаем их на 3D-принтере.  Мы поработаем с измерительными инструментами. Проведем замеры и выполним обратное проектирование деталей.', 'https://bytic.ru/courses/leto-2023/inzhenernyij-dizajn.html']]
+for i in range(len(lst0)):
+    cur.execute(f"""INSERT INTO courses0(id, name, description, link)
+       VALUES({i}, '{lst0[i][0]}', '{lst0[i][1]}', '{lst0[i][2]}');""")
+for i in range(len(lst1)):
+    cur.execute(f"""INSERT INTO courses1(id, name, description, link)
+       VALUES({i}, '{lst1[i][0]}', '{lst1[i][1]}', '{lst1[i][2]}');""")
+for i in range(len(lst5)):
+    cur.execute(f"""INSERT INTO courses5(id, name, description, link)
+       VALUES({i}, '{lst5[i][0]}', '{lst5[i][1]}', '{lst5[i][2]}');""")
+conn.commit()
